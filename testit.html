@@ -8,7 +8,7 @@
   <script src="bodhran-annotater.js"></script>
 
   <style type="text/css">
-      /* canvas { border: 1px solid black; } */
+      canvas { border: 1px solid black; } 
   </style>
 
  </head>
@@ -17,33 +17,82 @@
 
   <h1>Misc bits of Bodhr&aacute;n Notation</h1>
 
+  <h2>Tests</h2>
+
+  <p>No annotation:</p>
+
+  <canvas class="notation">
+     dddd
+  </canvas>
+
+  <br>
+
+  <p>Just superscripts:</p>
+
+  <canvas class="notation">
+     "^Sup"dddd
+  </canvas>
+
+  <br>
+
+  <p>Just subscripts:</p>
+
+  <canvas class="notation">
+     "_Sub"dddd
+  </canvas>
+
+  <br>
+
+  <p>Just triplets:</p>
+
+  <canvas class="notation">
+     d&amp;ddd
+  </canvas>
+
+  <br>
+
+  <p>High and Low tones:</p>
+
+  <canvas class="notation">
+     ^d=d_dd
+  </canvas>
+
+  <br>
+
+  <p>Everything:</p>
+
+  <canvas class="notation">
+     ^"^Sup"d=d_"_Sub"d&amp;d
+  </canvas>
+
+
   <h2>Available symbols</h2>
 
-   <canvas class="notation" width="1400" height="120">
-     T12/8 "^1""_Ma"d "^2""_ma"u - "^3""_Pa"D "^4""_pa"U | d&u,D&U | s S | ^d=d_d | =dd+d#d x2 x3
+   <canvas class="notation">
+     T12/8 "^1""_Ma"d "^2""_ma"u - "^3""_Pa"D "^4""_pa"U | d&amp;u,D&amp;U | s S | ^d=d_d | =dd+d#d x2 x3
    </canvas>
 
   <h2>Reels</h2>
 
-   <canvas class="notation" width="1400" height="120">
+   <canvas class="notation">
      T4/4 Dudu, Dudu | duDu, duDu |
    </canvas>
 
-   <canvas class="notation" width="1400" height="120">
-     T4/4 D-d- d-d- | Dudu d-d- x3
+   <canvas class="notation">
+     T4/4 D-d-, d-d- | Dudu, d-d- x3
    </canvas>
 
-   <canvas class="notation" width="1400" height="120">
-     T4/4 D-d- dudu | Sdus D Z
+   <canvas class="notation">
+     T4/4 D-d-, dudu | Sdus, D Z
    </canvas>
 
   <h2>Slip jigs</h2>
 
-   <canvas class="notation" width="1400" height="120">
+   <canvas class="notation">
      T9/8 "^DOWN"D-"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d | "^UP"U-"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u |
    </canvas>
 
-   <canvas class="notation" width="1400" height="120">
+   <canvas class="notation">
      T9/8 "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d | "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d
    </canvas>
 

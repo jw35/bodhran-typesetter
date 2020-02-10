@@ -10,14 +10,68 @@ document.addEventListener('DOMContentLoaded',  (event) => {
     var elements = document.getElementsByTagName('canvas');
     for(var i = 0; i < elements.length; i++) {
         if (elements[i].classList.contains('notation')) {
-            var notation = elements[i].innerHTML;
-            draw_notation(elements[i], notation);
+            var notation = decodeHTMLEntities(elements[i].innerHTML);
+            display_notation(elements[i], notation, 0.8);
         }
     }
 });
 
+function display_notation(canvas, notation, scale) {
 
-function draw_notation(canvas, notation) {
+    // Test run to find the width
+    var test_canvas = document.createElement('canvas');
+    var width = draw_notation(test_canvas, notation, scale);
+
+    // Live run with the right width
+    canvas.width = width + 10;
+    draw_notation(canvas, notation, scale);
+
+}
+
+
+function draw_notation(canvas, notation, scale) {
+
+    // Work out the various vertical dimensions
+
+    var flags = analyse_notation(notation);
+
+    var height = 80;
+    var offset = 70;
+    var sub_offset = 20;
+    var sup_offset = -65;
+
+    if (flags.tones && flags.subs && flags.sups) {
+        height = 140;
+        offset = 100;
+        sub_offset = 35;
+        sup_offset = -80;
+    }
+    else if (flags.tones && flags.sups) {
+        height = 125;
+        offset = 100;
+        sup_offset = -80;
+    }
+    else if (flags.tones && flags.subs) {
+        height = 125;
+        offset = 85;
+        sub_offset = 35;
+    }
+    else if (flags.tones) {
+        height = 110;
+        offset = 85;
+    }
+    else if (flags.sups && flags.subs) {
+        height = 110;
+        offset = 85;
+    }
+    else if (flags.sups) {
+        height = 95;
+        offset = 85;
+    }
+    else if (flags.subs) {
+        height = 95;
+    }
+
 
     var xpos = 10;
     var ypos = 0;
@@ -25,10 +79,12 @@ function draw_notation(canvas, notation) {
     if (canvas.getContext) {
         var ctx = canvas.getContext('2d');
 
-        ctx.translate(0, 90);
+        canvas.height = height * scale;
+        ctx.scale(scale, scale);
+        ctx.translate(0, offset);
 
         /// Remove spaces and split into a list of chars
-        var chars = notation.replace(/ /g, '').split('');
+        var chars = notation.replace(/\s/g, '').split('');
         var pos = 0;
 
         while (pos < chars.length) {
@@ -152,6 +208,8 @@ function draw_notation(canvas, notation) {
             pos++;
 
         }
+
+        return xpos * scale;
 
     }
 
@@ -300,7 +358,7 @@ function draw_notation(canvas, notation) {
 
         ctx.font = 'italic 15pt Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(text, xpos + 30, 20);
+        ctx.fillText(text, xpos + 30, sub_offset);
 
         ctx.restore();
 
@@ -312,7 +370,7 @@ function draw_notation(canvas, notation) {
 
         ctx.font = 'italic 15pt Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(text, xpos + 30, -65);
+        ctx.fillText(text, xpos + 30, sup_offset);
 
         ctx.restore();
 
@@ -342,13 +400,13 @@ function draw_notation(canvas, notation) {
         ctx.font = 'bold italic 15pt Arial';
         ctx.textAlign = 'center';
 
-        ctx.fillText('T', xpos, -65);
+        ctx.fillText('T', xpos, sup_offset);
 
         ctx.beginPath();
-        ctx.moveTo(xpos - 7, -73);
-        ctx.quadraticCurveTo(xpos - 27, -73, xpos - 30, -65);
-        ctx.moveTo(xpos + 7, -73);
-        ctx.quadraticCurveTo(xpos + 27, -73, xpos + 30, -65);
+        ctx.moveTo(xpos - 7, sup_offset-8);
+        ctx.quadraticCurveTo(xpos - 27, sup_offset-8, xpos - 30, sup_offset);
+        ctx.moveTo(xpos + 7, sup_offset-8);
+        ctx.quadraticCurveTo(xpos + 27, sup_offset-8, xpos + 30, sup_offset);
         ctx.stroke();
 
         ctx.restore();
@@ -461,4 +519,27 @@ function draw_notation(canvas, notation) {
 
     }
 
+    function analyse_notation(n) {
+
+        flags = {};
+
+        // Contains Hi/Min/Low tones if there's a ^ or _ not following a "
+        flags['tones'] = n.match(/(?:^|[^"])(?:\^|_)/);
+
+        // Contains superscript notation if there's "^ or & somewhere"
+        flags['sups'] = n.match(/(?:"\^)|&/);
+
+        // Contains subscript notation if there's a " not followed by ^
+        flags['subs'] = n.match(/"_/);
+
+        return(flags);
+
+    }
+
+}
+
+function decodeHTMLEntities(text) {
+    var textArea = document.createElement('textarea');
+    textArea.innerHTML = text;
+    return textArea.value;
 }
