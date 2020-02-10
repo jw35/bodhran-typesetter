@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8"/>
+  <script type="application/javascript">
+
+    function draw() {
+      var canvas = document.getElementById('canvas');
+      if (canvas.getContext) {
+        var ctx = canvas.getContext('2d');
+
+        ctx.translate(0,90)
+        //ctx.beginPath()
+        //ctx.moveTo(0,0.5)
+        //ctx.lineTo(800,0.5)
+        //ctx.stroke()
+
+        var xpos = 0
+
+        sup(ctx, xpos, '1')
+        sub(ctx, xpos, "Ma")
+        xpos += arrow(ctx, xpos, false, false, false)
+
+        sup(ctx, xpos, '2')
+        sub(ctx, xpos, "ma")
+        xpos += arrow(ctx, xpos, true, false, false)
+
+        xpos += dash(ctx, xpos)
+
+        sup(ctx, xpos, '3')
+        sub(ctx, xpos, "Pa")
+        xpos += arrow(ctx, xpos, false, true, false)
+
+        sup(ctx, xpos, '4')
+        sub(ctx, xpos, "pa")
+
+        xpos += arrow(ctx, xpos, true, true, false)
+
+        xpos += bar(ctx, xpos)
+
+        xpos += arrow(ctx, xpos, false, false, true)
+        xpos += arrow(ctx, xpos, true, false, true)
+        xpos += arrow(ctx, xpos, false, true, true)
+        xpos += arrow(ctx, xpos, true, true, true)
+
+        xpos += dash(ctx, xpos)
+
+        xpos += stab(ctx, xpos, false, false)
+        xpos += stab(ctx, xpos, true, false)
+        xpos += stab(ctx, xpos, false, true)
+        xpos += stab(ctx, xpos, true, true)
+
+        xpos += repeat(ctx, xpos, 3)
+
+      }
+    }
+
+    function arrow(ctx, xpos, rotate, wide, stroke) {
+
+      var width = 60
+
+      ctx.save()
+      // Character box is 60 wide, 60 high
+      ctx.translate(xpos + width/2, -30)
+
+      if (rotate) {
+        ctx.rotate(Math.PI)
+      }
+      if (wide) {
+        var inner = 10;
+        var outer = 26;
+      }
+      else {
+        var inner = 6;
+        var outer = 16;
+      }
+      ctx.beginPath()
+      ctx.moveTo(0,-24)
+      ctx.lineTo(inner,-30)
+      ctx.lineTo(inner,0)
+      ctx.lineTo(outer,-4)
+      ctx.quadraticCurveTo(inner, 10, 0, 30)
+      ctx.quadraticCurveTo(-inner, 10, -outer, -4)
+      ctx.lineTo(-inner,0)
+      ctx.lineTo(-inner,-30)
+      ctx.closePath()
+      if (stroke) {
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 1
+        ctx.lineJoin = 'miter'
+        ctx.stroke()
+      }
+      else {
+        ctx.fillStyle = 'black'
+        ctx.fill()
+      }
+
+      ctx.restore()
+
+      return width
+
+    }
+
+    function stab(ctx, xpos, wide, stroke) {
+
+      width = 60
+
+      ctx.save()
+      ctx.translate(xpos + width/2, -30)
+
+      if (wide) {
+        var inner = 10;
+        var outer = 26;
+      }
+      else {
+        var inner = 6;
+        var outer = 16;
+      }
+      ctx.beginPath()
+      ctx.moveTo(0,-30)
+      ctx.quadraticCurveTo(inner, -10, outer, 0)
+      ctx.quadraticCurveTo(inner, 10, 0, 30)
+      ctx.quadraticCurveTo(-inner, 10, -outer, 0)
+      ctx.quadraticCurveTo(-inner, -10, 0, -30)
+      ctx.closePath()
+      if (stroke) {
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 1
+        ctx.lineJoin = 'miter'
+        ctx.stroke()
+      }
+      else {
+        ctx.fillStyle = 'black'
+        ctx.fill()
+      }
+
+      ctx.restore()
+
+      return width
+
+    }
+
+    function dash(ctx, xpos) {
+
+      var width = 60
+
+      ctx.save()
+
+      ctx.beginPath()
+      ctx.moveTo(xpos + 15, -30)
+      ctx.lineTo(xpos + 45, -30)
+      ctx.strokeStyle = 'black'
+      ctx.lineWidth = 4
+      ctx.lineCap = 'butt'
+      ctx.stroke()
+
+      ctx.restore()
+
+      return width
+
+    }
+
+    function bar(ctx, xpos) {
+
+      ctx.save()
+
+      ctx.beginPath()
+      ctx.moveTo(xpos + 20, 0)
+      ctx.lineTo(xpos + 20, -60)
+      ctx.strokeStyle = 'black'
+      ctx.lineWidth = 4
+      ctx.lineCap = 'butt'
+      ctx.stroke()
+
+      ctx.restore()
+
+      return 40
+
+    }
+
+    function sub(ctx, xpos, text) {
+
+      ctx.save()
+
+      ctx.font = "italic 15pt Arial"
+      ctx.textAlign = "center"
+      ctx.fillText(text, xpos + 30, 20)
+
+      ctx.restore()
+
+      return 0
+
+    }
+
+    function sup(ctx, xpos, text) {
+
+      ctx.save()
+
+      ctx.font = "italic 15pt Arial"
+      ctx.textAlign = "center"
+      ctx.fillText(text, xpos + 30, -65)
+
+      ctx.restore()
+
+      return 0
+
+    }
+
+    function repeat(ctx, xpos, times) {
+
+      ctx.save()
+
+      ctx.strokeStyle = 'black'
+      ctx.lineWidth = 4
+      ctx.lineCap = 'butt'
+
+      ctx.beginPath()
+      ctx.arc(xpos + 20, -40, 4, 0, Math.PI*2)
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.arc(xpos + 20, -20, 4, 0, Math.PI*2)
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.moveTo(xpos + 30, 0)
+      ctx.lineTo(xpos + 30, -60)
+      ctx.moveTo(xpos + 40, 0)
+      ctx.lineTo(xpos + 40, -60)
+      ctx.stroke()
+
+      if (times > 2) {
+        ctx.font = "20pt Arial"
+        ctx.textAlign = "start"
+        ctx.textBaseline = "middle"
+        ctx.fillText('X' + times, xpos + 50, -30)
+      }
+
+      ctx.restore()
+
+      return 60
+
+    }
+
+
+  </script>
+    <style type="text/css">
+      canvas { border: 1px solid black; }
+    </style>
+ </head>
+ <body onload="draw();">
+   <canvas id="canvas" width="1000" height="120"></canvas>
+ </body>
+</html>
