@@ -353,6 +353,8 @@ function draw_notation(canvas, notation, scale, flags) {
 
         ctx.restore();
 
+        staff_line(40);
+
         xpos += 40;
 
     }
@@ -529,13 +531,15 @@ function draw_notation(canvas, notation, scale, flags) {
 
             width = 40;
 
+            staff_line(40);
+
             if (times > 2) {
                 ctx.font = '24pt Arial';
                 ctx.textAlign = 'start';
                 ctx.textBaseline = 'middle';
                 var label = '\u00d7' + times;
-                ctx.fillTextDefault('\u00d7' + times, xpos + 40, 0);
-                width += ctx.measureText(label).width + 5;
+                ctx.fillTextDefault('\u00d7' + times, xpos + 45, 0);
+                width += ctx.measureText(label).width + 10;
             }
 
             ctx.restore();
