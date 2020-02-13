@@ -20,77 +20,64 @@ function display_notation(canvas, notation, scale) {
 
     // Test run to find the width
     var test_canvas = document.createElement('canvas');
-    var width = draw_notation(test_canvas, notation, scale);
+    var flags = draw_notation(test_canvas, notation, scale, {});
 
     // Live run with the right width
-    canvas.width = width + 10;
-    draw_notation(canvas, notation, scale);
+    canvas.width = flags['width'] + 10;
+    draw_notation(canvas, notation, scale, flags);
 
 }
 
 
-function draw_notation(canvas, notation, scale) {
+function draw_notation(canvas, notation, scale, flags) {
 
-    // Work out the various vertical dimensions
-
-    var flags = analyse_notation(notation);
-
-    var height = 80;
-    var offset = 70;
-    var sub_offset = 25;
-    var sup_offset = -65;
-
-    if (flags.tones && flags.subs && flags.sups) {
-        height = 170;
-        offset = 115;
-        sub_offset = 50;
-        sup_offset = -90;
-    }
-    else if (flags.tones && flags.sups) {
-        height = 145;
-        offset = 110;
-        sup_offset = -90;
-    }
-    else if (flags.tones && flags.subs) {
-        height = 150;
-        offset = 95;
-        sub_offset = 50;
-    }
-    else if (flags.tones) {
-        height = 130;
-        offset = 95;
-    }
-    else if (flags.sups && flags.subs) {
-        height = 120;
-        offset = 90;
-    }
-    else if (flags.sups) {
-        height = 100;
-        offset = 90;
-    }
-    else if (flags.subs) {
-        height = 100;
-    }
-
-
-    var xpos = 10;
-    var ypos = 0;
+    var analysis = {};
 
     if (canvas.getContext) {
         var ctx = canvas.getContext('2d');
 
-        canvas.height = height * scale;
-        ctx.scale(scale, scale);
-        ctx.translate(0, offset);
+        // A version for fillText that doesn't mirror
+        ctx.fillTextDefault = function(text, x, y) {
+            this.save();
+            this.scale(1, -1);
+            this.fillText(text, x, -y);
+            this.restore();
+        };
+
+        // Work out the various vertical dimensions
+
+        var symbol_height = 60;
+        var superscript_height = 0;
+        var subscript_height = 0;
+        var margin = 10;
 
         if (flags.tones) {
-            ctx.beginPath();
-            ctx.moveTo(0, -30);
-            ctx.lineTo(canvas.width/scale, -30);
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 1;
-            ctx.stroke();
+            symbol_height += 50;
         }
+        if (flags.superscripts) {
+            superscript_height = 25;
+        }
+        if (flags.subscripts) {
+            subscript_height = 25;
+        }
+
+        // Setup the canvas with +ve y-axis up and y=0 in the centre of
+        // the symbol row
+
+        var canvas_height = (margin + subscript_height +
+                             symbol_height +
+                             superscript_height + margin) * scale;
+        // Distance from top of canvas to the symbol line centre
+        var centre_offset = (symbol_height/2 + superscript_height + 10) * scale;
+
+        canvas.height = canvas_height;
+        ctx.translate(0, centre_offset);
+        ctx.scale(scale, -scale);
+
+
+        var xpos = 10;
+        var symbol_offset = 0;
+
 
         /// Remove spaces and split into a list of chars
         var chars = notation.replace(/\s/g, '').split('');
@@ -218,15 +205,17 @@ function draw_notation(canvas, notation, scale) {
 
         }
 
-        return xpos * scale;
+        analysis['width'] = xpos * scale;
+
+        return analysis;
 
     }
 
     function arrow(rotate, wide, stroke) {
 
         ctx.save();
-        // Character box is 60 wide, 60 high
-        ctx.translate(xpos + 40, ypos - 30);
+        // Character box is 80 wide, 60 high
+        ctx.translate(xpos + 40, symbol_offset);
 
         if (rotate) {
             ctx.rotate(Math.PI);
@@ -240,14 +229,14 @@ function draw_notation(canvas, notation, scale) {
         }
 
         ctx.beginPath();
-        ctx.moveTo(0, -24);
-        ctx.lineTo(inner, -30);
+        ctx.moveTo(0, 24);
+        ctx.lineTo(inner, 30);
         ctx.lineTo(inner, 0);
-        ctx.lineTo(outer, -4);
-        ctx.quadraticCurveTo(inner, 10, 0, 30);
-        ctx.quadraticCurveTo(-inner, 10, -outer, -4);
+        ctx.lineTo(outer, 4);
+        ctx.quadraticCurveTo(inner, -10, 0, -30);
+        ctx.quadraticCurveTo(-inner, -10, -outer, 4);
         ctx.lineTo(-inner, 0);
-        ctx.lineTo(-inner, -30);
+        ctx.lineTo(-inner, 30);
         ctx.closePath();
         if (stroke) {
             ctx.strokeStyle = 'black';
@@ -261,6 +250,8 @@ function draw_notation(canvas, notation, scale) {
         }
 
         ctx.restore();
+
+        staff_line(80);
 
         xpos += 80;
 
@@ -269,19 +260,18 @@ function draw_notation(canvas, notation, scale) {
     function stab(wide, stroke) {
 
         ctx.save();
-        ctx.translate(xpos + 40, ypos - 30);
+        ctx.translate(xpos + 40, symbol_offset);
 
         var delta = 16;
         if (wide) {
             delta = 26;
         }
         ctx.beginPath();
-        ctx.moveTo(0, -delta);
-        //ctx.moveTo(delta, 0)
-        ctx.quadraticCurveTo(delta/2-2, -delta/2+2, delta, 0);
-        ctx.quadraticCurveTo(delta/2-2, delta/2-2, 0, delta);
-        ctx.quadraticCurveTo(-delta/2+2, delta/2-2, -delta, 0);
-        ctx.quadraticCurveTo(-delta/2+2, -delta/2+2, 0, -delta);
+        ctx.moveTo(0, delta);
+        ctx.quadraticCurveTo(delta/2-2, delta/2-2, delta, 0);
+        ctx.quadraticCurveTo(delta/2-2, -delta/2+2, 0, -delta);
+        ctx.quadraticCurveTo(-delta/2+2, -delta/2+2, -delta, 0);
+        ctx.quadraticCurveTo(-delta/2+2, delta/2-2, 0, delta);
         ctx.closePath();
         if (stroke) {
             ctx.strokeStyle = 'black';
@@ -295,6 +285,8 @@ function draw_notation(canvas, notation, scale) {
         }
 
         ctx.restore();
+
+        staff_line(80);
 
         xpos += 80;
 
@@ -305,14 +297,16 @@ function draw_notation(canvas, notation, scale) {
         ctx.save();
 
         ctx.beginPath();
-        ctx.moveTo(xpos + 20, -30);
-        ctx.lineTo(xpos + 60, -30);
+        ctx.moveTo(xpos + 20, 0);
+        ctx.lineTo(xpos + 60, 0);
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 4;
         ctx.lineCap = 'butt';
         ctx.stroke();
 
         ctx.restore();
+
+        staff_line(80);
 
         xpos += 80;
 
@@ -323,14 +317,16 @@ function draw_notation(canvas, notation, scale) {
         ctx.save();
 
         ctx.beginPath();
-        ctx.moveTo(xpos + 15, 0);
-        ctx.lineTo(xpos + 15, -60);
+        ctx.moveTo(xpos + 15, 30);
+        ctx.lineTo(xpos + 15, -30);
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 4;
         ctx.lineCap = 'butt';
         ctx.stroke();
 
         ctx.restore();
+
+        staff_line(30);
 
         xpos += 30;
 
@@ -344,14 +340,14 @@ function draw_notation(canvas, notation, scale) {
         ctx.lineCap = 'butt';
 
         ctx.beginPath();
-        ctx.moveTo(xpos + 15, 0);
-        ctx.lineTo(xpos + 15, -60);
+        ctx.moveTo(xpos + 15, 30);
+        ctx.lineTo(xpos + 15, -30);
         ctx.lineWidth = 4;
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(xpos + 25, 0);
-        ctx.lineTo(xpos + 25, -60);
+        ctx.moveTo(xpos + 25, 30);
+        ctx.lineTo(xpos + 25, -30);
         ctx.lineWidth = 6;
         ctx.stroke();
 
@@ -367,9 +363,12 @@ function draw_notation(canvas, notation, scale) {
 
         ctx.font = 'italic 20pt Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(text, xpos + 40, sub_offset);
+        ctx.textBaseline = 'top';
+        ctx.fillTextDefault(text, xpos + 40, -symbol_height/2 - 8);
 
         ctx.restore();
+
+        analysis['subscripts'] = true;
 
     }
 
@@ -379,9 +378,12 @@ function draw_notation(canvas, notation, scale) {
 
         ctx.font = 'italic 20pt Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(text, xpos + 40, sup_offset);
+        ctx.textBaseline = 'bottom';
+        ctx.fillTextDefault(text, xpos + 40, symbol_height/2 + 2);
 
         ctx.restore();
+
+        analysis['superscripts'] = true;
 
     }
 
@@ -391,9 +393,11 @@ function draw_notation(canvas, notation, scale) {
 
         ctx.font = 'bold italic 30pt Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(',', xpos+10, 0);
+        ctx.fillTextDefault(',', xpos+10, -symbol_height/2);
 
         ctx.restore();
+
+        staff_line(20);
 
         xpos += 20;
 
@@ -409,46 +413,55 @@ function draw_notation(canvas, notation, scale) {
         ctx.font = 'bold italic 20pt Arial';
         ctx.textAlign = 'center';
 
-        ctx.fillText('T', xpos, sup_offset);
+        ctx.fillTextDefault('T', xpos, symbol_height/2);
 
         ctx.beginPath();
-        ctx.moveTo(xpos - 7, sup_offset-8);
-        ctx.quadraticCurveTo(xpos - 37, sup_offset-8, xpos - 40, sup_offset);
-        ctx.moveTo(xpos + 7, sup_offset-8);
-        ctx.quadraticCurveTo(xpos + 37, sup_offset-8, xpos + 40, sup_offset);
+        ctx.moveTo(xpos - 7, (symbol_height/2)+8);
+        ctx.quadraticCurveTo(xpos - 37, (symbol_height/2)+8, xpos - 40, (symbol_height/2));
+        ctx.moveTo(xpos + 7, (symbol_height/2)+8);
+        ctx.quadraticCurveTo(xpos + 37, (symbol_height/2)+8, xpos + 40, (symbol_height/2));
         ctx.stroke();
 
         ctx.restore();
+
+        analysis['superscripts'] = true;
 
     }
 
     function space(howmuch) {
 
-        xpos += (howmuch ? howmuch : 40);
+        var dist = (howmuch ? howmuch : 40);
+
+        staff_line(dist);
+        xpos += dist;
 
     }
 
     function negspace(howmuch) {
 
-        xpos -= (howmuch ? howmuch : 40);
+        var dist = (howmuch ? howmuch : 40);
+
+        xpos -= dist;
 
     }
 
     function high() {
 
-        ypos = -25;
+        symbol_offset = 25;
+        analysis['tones'] = true;
 
     }
 
     function mid() {
 
-        ypos = 0;
+        symbol_offset = 0;
 
     }
 
     function low() {
 
-        ypos = 25;
+        symbol_offset = -25;
+        analysis['tones'] = true;
 
     }
 
@@ -462,13 +475,18 @@ function draw_notation(canvas, notation, scale) {
         ctx.font = 'bold 35pt Times';
         ctx.textAlign = 'center';
 
-        var width = Math.max(ctx.measureText(beats).width, ctx.measureText(measure).width);
+        // Widest of '12' and actual beats and measure to promote
+        // consistent alignment
+        var width = Math.max(
+            ctx.measureText('12').width,
+            ctx.measureText(beats).width,
+            ctx.measureText(measure).width);
 
         ctx.textBaseline = 'alphabetic';
-        ctx.fillText(beats, xpos + 10 + (width/2), -30);
+        ctx.fillTextDefault(beats, xpos + 10 + (width/2), 0);
 
         ctx.textBaseline = 'top';
-        ctx.fillText(measure, xpos + 10 + (width/2), -30);
+        ctx.fillTextDefault(measure, xpos + 10 + (width/2), 0);
 
         ctx.restore();
 
@@ -495,28 +513,28 @@ function draw_notation(canvas, notation, scale) {
             ctx.lineCap = 'butt';
 
             ctx.beginPath();
-            ctx.arc(xpos + 0, -40, 3, 0, Math.PI*2);
+            ctx.arc(xpos + 10, 10, 3, 0, Math.PI*2);
             ctx.fill();
 
             ctx.beginPath();
-            ctx.arc(xpos + 0, -20, 3, 0, Math.PI*2);
+            ctx.arc(xpos + 10, -10, 3, 0, Math.PI*2);
             ctx.fill();
 
             ctx.beginPath();
-            ctx.moveTo(xpos + 10, 0);
-            ctx.lineTo(xpos + 10, -60);
-            ctx.moveTo(xpos + 20, 0);
-            ctx.lineTo(xpos + 20, -60);
+            ctx.moveTo(xpos + 20, -30);
+            ctx.lineTo(xpos + 20, 30);
+            ctx.moveTo(xpos + 30, -30);
+            ctx.lineTo(xpos + 30, 30);
             ctx.stroke();
 
-            width = 30;
+            width = 40;
 
             if (times > 2) {
                 ctx.font = '24pt Arial';
                 ctx.textAlign = 'start';
                 ctx.textBaseline = 'middle';
                 var label = '\u00d7' + times;
-                ctx.fillText('\u00d7' + times, xpos + 30, -30);
+                ctx.fillTextDefault('\u00d7' + times, xpos + 40, 0);
                 width += ctx.measureText(label).width + 5;
             }
 
@@ -528,20 +546,16 @@ function draw_notation(canvas, notation, scale) {
 
     }
 
-    function analyse_notation(n) {
+    function staff_line(width) {
 
-        flags = {};
-
-        // Contains Hi/Min/Low tones if there's a ^ or _ not following a "
-        flags['tones'] = n.match(/(?:^|[^"])(?:\^|_)/);
-
-        // Contains superscript notation if there's "^ or & somewhere"
-        flags['sups'] = n.match(/(?:"\^)|\+/);
-
-        // Contains subscript notation if there's a " not followed by ^
-        flags['subs'] = n.match(/"_/);
-
-        return(flags);
+        if (flags.tones) {
+            ctx.beginPath();
+            ctx.moveTo(xpos, 0);
+            ctx.lineTo(xpos+width, 0);
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
 
     }
 
