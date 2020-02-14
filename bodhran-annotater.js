@@ -186,6 +186,7 @@ function draw_notation(canvas, notation, scale, flags) {
                 }
 
                 else if (chars[pos] === 't' || chars[pos] === 'T') {
+                    var draw = chars[pos] === 'T';
                     pos++;
                     var b = '';
                     var m = '';
@@ -198,7 +199,7 @@ function draw_notation(canvas, notation, scale, flags) {
                         m += chars[pos];
                         pos ++;
                     }
-                    width = tsig(b, m);
+                    width = tsig(b, m, draw);
                     pos --;
                 }
 
@@ -472,7 +473,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
     }
 
-    function tsig(beats, measure) {
+    function tsig(beats, measure, actually_draw) {
 
         ctx.save();
 
@@ -489,11 +490,12 @@ function draw_notation(canvas, notation, scale, flags) {
             ctx.measureText(beats).width,
             ctx.measureText(measure).width);
 
-        ctx.textBaseline = 'alphabetic';
-        ctx.fillTextDefault(beats, xpos + 10 + (w/2), 0);
-
-        ctx.textBaseline = 'top';
-        ctx.fillTextDefault(measure, xpos + 10 + (w/2), 0);
+        if (actually_draw) {
+            ctx.textBaseline = 'alphabetic';
+            ctx.fillTextDefault(beats, xpos + 10 + (w/2), 0);
+            ctx.textBaseline = 'top';
+            ctx.fillTextDefault(measure, xpos + 10 + (w/2), 0);
+        }
 
         ctx.restore();
 
@@ -504,7 +506,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
     function repeat(times) {
 
-        if (times === undefined) {
+        if (!times) {
             times = 2;
         }
 
