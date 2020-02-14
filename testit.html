@@ -5,7 +5,7 @@
 
   <meta charset="utf-8"/>
 
-  <script src="bodhran-annotater.js"></script>
+  <script src="bodhran-typesetter.js"></script>
 
   <style type="text/css">
       canvas { border: 1px solid black; } 
@@ -22,7 +22,7 @@
   <p>No annotation:</p>
 
   <canvas class="notation">
-     dddd
+     dudu
   </canvas>
 
   <br>
@@ -30,7 +30,7 @@
   <p>Just superscripts:</p>
 
   <canvas class="notation">
-     "^Sup"dddd
+     "^Sup"dudu
   </canvas>
 
   <br>
@@ -38,7 +38,7 @@
   <p>Just subscripts:</p>
 
   <canvas class="notation">
-     "_Sub"d"Sub"ddd
+     "_Sub"d"Sub"udu
   </canvas>
 
   <br>
@@ -46,14 +46,14 @@
   <p>Superscripts and subscripts:</p>
 
   <canvas class="notation">
-     "_Sub"d"^Sup"ddd
+     "_Sub"d"^Sup"udu
   </canvas>
 
   <br>
   <p>Just triplets:</p>
 
   <canvas class="notation">
-     d+ddd
+     d+udu
   </canvas>
 
   <br>
@@ -61,7 +61,7 @@
   <p>High and Low tones:</p>
 
   <canvas class="notation">
-     ^d=d_dd
+     ^d=u_d=u
   </canvas>
 
   <br>
@@ -69,18 +69,18 @@
   <p>Everything:</p>
 
   <canvas class="notation">
-     ^"^Sup"d=d_d"_Sub"+d
+     ^"^Sup"d=u_d"_Sub"+=u
   </canvas>
 
 
   <h2>Available symbols</h2>
 
    <canvas class="notation">
-     T12/8 "^1""_Ma"d "^2""_ma"u "^3""_Pa"D "^4""_pa"U | d+u,D+U | s - S - x ^d=d_d | =dd#dbd z
+     T4/4 "^1""_Ma"d "^2""_ma"u "^3""_Pa"D "^4""_pa"U | d+u,D+U | s - S - x ^d=u_d=u | =du#dbu z
    </canvas>
 
    <canvas class="notation">
-     t12/8 ^"^1"D ="^2"d _"^3"d | ^"_DOWN"D ="_down"d _"_down"d | ^"DOWN"D "down"=d _"down"d x3
+     t12/8 ^"^1"D ="^2"u _"^3"d | ^"_DOWN"D ="_up"u _"_down"d | ^"DOWN"D "up"=u _"down"d x3
    </canvas>
 
   <h2>Reels</h2>
@@ -89,12 +89,14 @@
      T4/4 Dudu, Dudu | duDu, duDu |
    </canvas>
 
+   <h3></h3>
+
    <canvas class="notation">
      T4/4 D-d-, d-d- | Dudu, d-d- x3
    </canvas>
 
    <canvas class="notation">
-     T4/4 D-d-, dudu | Sdus, D Z
+     T4/4 D-d-, dudu | Sdus, D--- Z
    </canvas>
 
   <h2>Slip jigs</h2>
@@ -104,7 +106,7 @@
    </canvas>
 
    <canvas class="notation">
-     T9/8 "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d | "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d
+     T9/8 "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d | "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d |
    </canvas>
 
  </body>
