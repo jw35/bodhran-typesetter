@@ -74,10 +74,9 @@ function draw_notation(canvas, notation, scale, flags) {
         ctx.translate(0, centre_offset);
         ctx.scale(scale, -scale);
 
-
         var xpos = 10;
         var symbol_offset = 0;
-
+        var annotation = {};
 
         /// Remove spaces and split into a list of chars
         var chars = notation.replace(/\s/g, '').split('');
@@ -85,122 +84,142 @@ function draw_notation(canvas, notation, scale, flags) {
 
         while (pos < chars.length) {
 
-            if (chars[pos] === 'd') {
-                arrow(false, false, false);
-            }
-
-            else if (chars[pos] === 'u') {
-                arrow(true, false, false);
-            }
-
-            else if (chars[pos] === 'D') {
-                arrow(false, true, false);
-            }
-
-            else if (chars[pos] === 'U') {
-                arrow(true, true, false);
-            }
-
-            else if (chars[pos] === 's') {
-                stab(false, false);
-            }
-
-            else if (chars[pos] === 'S') {
-                stab(true, false);
-            }
-
-            else if (chars[pos] === '-') {
-                dash();
-            }
-
-            else if (chars[pos] === '|') {
-                bar();
-            }
-
-            else if (chars[pos] === 'z' || chars[pos] === 'Z') {
-                end();
-            }
-
-            else if (chars[pos] === ',') {
-                comma();
-            }
-
-            else if (chars[pos] === '+') {
-                triplet();
-            }
-
-            else if (chars[pos] === '#') {
-                space();
-            }
-
-            else if (chars[pos] === 'b' || chars[pos] === 'B') {
-                negspace();
-            }
-
-            else if (chars[pos] === '^') {
-                high();
-            }
-
-            else if (chars[pos] === '=') {
-                mid();
-            }
-
-            else if (chars[pos] === '_') {
-                low();
-            }
-
-            else if (chars[pos] === '"') {
+            // Capture annotation for the future
+            if (chars[pos] === '"') {
                 pos++;
-                var fn = sub;
+                var which = 'sub';
                 var str = '';
-                if (chars[pos] === '^') {
-                    fn = sup;
+                if (chars[pos] === '_') {
                     pos++;
                 }
-                else if (chars[pos] === '_') {
-                    fn = sub;
+                if (chars[pos] === '^') {
+                    which = 'sup';
                     pos++;
                 }
 
                 while (pos < chars.length && chars[pos] !== '"') {
-
                     str += chars[pos];
                     pos++;
                 }
-                fn(str);
+                annotation[which] = str;
+            }
+            // Capture Hi/Mid/Low shifts
+            else if (chars[pos] === '^') {
+                symbol_offset = 25;
+                analysis['tones'] = true;
+            }
+            else if (chars[pos] === '=') {
+                symbol_offset = 0;
             }
 
-            else if (chars[pos] === 'x' || chars[pos] === 'X') {
-                pos++;
-                var count = '';
-                while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                    count += chars[pos];
-                    pos ++;
-                }
-                repeat(count);
-                pos --;
+            else if (chars[pos] === '_') {
+                symbol_offset = -25;
+                analysis['tones'] = true;
             }
 
-            else if (chars[pos] === 't' || chars[pos] === 'T') {
-                pos++;
-                var b = '';
-                var m = '';
-                while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                    b += chars[pos];
-                    pos ++;
-                }
-                pos++;
-                while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                    m += chars[pos];
-                    pos ++;
-                }
-                tsig(b, m);
-                pos --;
-            }
-
+            // Otherwise draw things
             else {
-                console.log('Unrecognised character in encoding: ' + chars[pos]);
+
+                var width = 0;
+
+                if (chars[pos] === 'd') {
+                    width = arrow(false, false, false);
+                }
+
+                else if (chars[pos] === 'u') {
+                    width = arrow(true, false, false);
+                }
+
+                else if (chars[pos] === 'D') {
+                    width = arrow(false, true, false);
+                }
+
+                else if (chars[pos] === 'U') {
+                    width = arrow(true, true, false);
+                }
+
+                else if (chars[pos] === 's') {
+                    width = stab(false, false);
+                }
+
+                else if (chars[pos] === 'S') {
+                    width = stab(true, false);
+                }
+
+                else if (chars[pos] === '-') {
+                    width = dash();
+                }
+
+                else if (chars[pos] === '|') {
+                    width = bar();
+                }
+
+                else if (chars[pos] === 'z' || chars[pos] === 'Z') {
+                    width = end();
+                }
+
+                else if (chars[pos] === ',') {
+                    width = comma();
+                }
+
+                else if (chars[pos] === '+') {
+                    width = triplet();
+                }
+
+                else if (chars[pos] === '#') {
+                    width = space();
+                }
+
+                else if (chars[pos] === 'b' || chars[pos] === 'B') {
+                    width = negspace();
+                }
+
+                else if (chars[pos] === 'x' || chars[pos] === 'X') {
+                    pos++;
+                    var count = '';
+                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                        count += chars[pos];
+                        pos ++;
+                    }
+                    width = repeat(count);
+                    pos --;
+                }
+
+                else if (chars[pos] === 't' || chars[pos] === 'T') {
+                    pos++;
+                    var b = '';
+                    var m = '';
+                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                        b += chars[pos];
+                        pos ++;
+                    }
+                    pos++;
+                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                        m += chars[pos];
+                        pos ++;
+                    }
+                    width = tsig(b, m);
+                    pos --;
+                }
+
+                else {
+                    console.log('Unrecognised character in encoding: ' + chars[pos]);
+                }
+
+                // Draw pending annotations
+                if (annotation.sup !== undefined) {
+                    sup(annotation.sup, width);
+                }
+                if (annotation.sub !== undefined) {
+                    sub(annotation.sub, width);
+                }
+                annotation = {};
+
+                // Move on drawing position
+                xpos += width;
+
             }
+
             pos++;
 
         }
@@ -253,7 +272,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
         staff_line(80);
 
-        xpos += 80;
+        return 80;
 
     }
 
@@ -288,7 +307,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
         staff_line(80);
 
-        xpos += 80;
+        return 80;
 
     }
 
@@ -308,7 +327,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
         staff_line(80);
 
-        xpos += 80;
+        return 80;
 
     }
 
@@ -328,7 +347,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
         staff_line(30);
 
-        xpos += 30;
+        return 30;
 
     }
 
@@ -355,37 +374,41 @@ function draw_notation(canvas, notation, scale, flags) {
 
         staff_line(40);
 
-        xpos += 40;
+        return 40;
 
     }
 
-    function sub(text) {
+    function sub(text, w) {
 
         ctx.save();
 
         ctx.font = 'italic 20pt Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        ctx.fillTextDefault(text, xpos + 40, -symbol_height/2 - 8);
+        ctx.fillTextDefault(text, xpos + w/2, -symbol_height/2 - 8);
 
         ctx.restore();
 
         analysis['subscripts'] = true;
 
+        return 0;
+
     }
 
-    function sup(text) {
+    function sup(text, w) {
 
         ctx.save();
 
         ctx.font = 'italic 20pt Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
-        ctx.fillTextDefault(text, xpos + 40, symbol_height/2 + 2);
+        ctx.fillTextDefault(text, xpos + w/2, symbol_height/2 + 2);
 
         ctx.restore();
 
         analysis['superscripts'] = true;
+
+        return 0;
 
     }
 
@@ -401,7 +424,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
         staff_line(20);
 
-        xpos += 20;
+        return 20;
 
     }
 
@@ -428,6 +451,8 @@ function draw_notation(canvas, notation, scale, flags) {
 
         analysis['superscripts'] = true;
 
+        return 0;
+
     }
 
     function space(howmuch) {
@@ -435,7 +460,7 @@ function draw_notation(canvas, notation, scale, flags) {
         var dist = (howmuch ? howmuch : 40);
 
         staff_line(dist);
-        xpos += dist;
+        return dist;
 
     }
 
@@ -443,27 +468,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
         var dist = (howmuch ? howmuch : 40);
 
-        xpos -= dist;
-
-    }
-
-    function high() {
-
-        symbol_offset = 25;
-        analysis['tones'] = true;
-
-    }
-
-    function mid() {
-
-        symbol_offset = 0;
-
-    }
-
-    function low() {
-
-        symbol_offset = -25;
-        analysis['tones'] = true;
+        return -dist;
 
     }
 
@@ -479,20 +484,20 @@ function draw_notation(canvas, notation, scale, flags) {
 
         // Widest of '12' and actual beats and measure to promote
         // consistent alignment
-        var width = Math.max(
+        var w = Math.max(
             ctx.measureText('12').width,
             ctx.measureText(beats).width,
             ctx.measureText(measure).width);
 
         ctx.textBaseline = 'alphabetic';
-        ctx.fillTextDefault(beats, xpos + 10 + (width/2), 0);
+        ctx.fillTextDefault(beats, xpos + 10 + (w/2), 0);
 
         ctx.textBaseline = 'top';
-        ctx.fillTextDefault(measure, xpos + 10 + (width/2), 0);
+        ctx.fillTextDefault(measure, xpos + 10 + (w/2), 0);
 
         ctx.restore();
 
-        xpos += width + 25;
+        return w + 25;
 
     }
 
@@ -503,7 +508,7 @@ function draw_notation(canvas, notation, scale, flags) {
             times = 2;
         }
 
-        var width = 0;
+        var this_width = 0;
 
         // A repeat of less than two makes no sense
         if (times >= 2) {
@@ -529,7 +534,7 @@ function draw_notation(canvas, notation, scale, flags) {
             ctx.lineTo(xpos + 30, 30);
             ctx.stroke();
 
-            width = 40;
+            this_width = 40;
 
             staff_line(40);
 
@@ -539,23 +544,23 @@ function draw_notation(canvas, notation, scale, flags) {
                 ctx.textBaseline = 'middle';
                 var label = '\u00d7' + times;
                 ctx.fillTextDefault('\u00d7' + times, xpos + 45, 0);
-                width += ctx.measureText(label).width + 10;
+                this_width += ctx.measureText(label).width + 10;
             }
 
             ctx.restore();
 
         }
 
-        xpos += width;
+        return this_width;
 
     }
 
-    function staff_line(width) {
+    function staff_line(w) {
 
         if (flags.tones) {
             ctx.beginPath();
             ctx.moveTo(xpos, 0);
-            ctx.lineTo(xpos+width, 0);
+            ctx.lineTo(xpos+w, 0);
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 1;
             ctx.stroke();
