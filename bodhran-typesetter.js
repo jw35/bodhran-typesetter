@@ -1,233 +1,240 @@
-/* eslint max-lines-per-function: ["warn", 1000] */
+/* eslint  max-lines-per-function: ["warn", 250], no-console: "off" */
 
 /*jslint browser: true */
 /*jshint esversion: 6 */
-/*global  */
 
-/* exported init */
+/* exported BodhranTypesetter */
 
-document.addEventListener('DOMContentLoaded',  (event) => {
-    var elements = document.getElementsByTagName('canvas');
-    for(var i = 0; i < elements.length; i++) {
-        if (elements[i].classList.contains('notation')) {
-            var notation = decodeHTMLEntities(elements[i].innerHTML);
-            display_notation(elements[i], notation, 0.6);
+var BodhranTypesetter = (function() {
+
+    document.addEventListener('DOMContentLoaded',  () => {
+        var elements = document.getElementsByTagName('canvas');
+        for(var i = 0; i < elements.length; i++) {
+            if (elements[i].classList.contains('notation')) {
+                var notation = decodeHTMLEntities(elements[i].innerHTML);
+                display_notation(elements[i], notation, 0.6);
+            }
         }
+    });
+
+
+    function display_notation(canvas, notation, scale) {
+
+        // Test run to find the width
+        var test_canvas = document.createElement('canvas');
+        var flags = draw_notation(test_canvas, notation, scale, {});
+
+        // Live run with the right width
+        canvas.width = flags['width'] + 10;
+        draw_notation(canvas, notation, scale, flags);
+
     }
-});
-
-function display_notation(canvas, notation, scale) {
-
-    // Test run to find the width
-    var test_canvas = document.createElement('canvas');
-    var flags = draw_notation(test_canvas, notation, scale, {});
-
-    // Live run with the right width
-    canvas.width = flags['width'] + 10;
-    draw_notation(canvas, notation, scale, flags);
-
-}
 
 
-function draw_notation(canvas, notation, scale, flags) {
+    // NAsty global state...
+    var ctx, xpos, symbol_offset, symbol_height, analysis, tones;
 
-    var analysis = {};
 
-    if (canvas.getContext) {
-        var ctx = canvas.getContext('2d');
+    function draw_notation(canvas, notation, scale, flags) {
 
-        // A version for fillText that doesn't mirror
-        ctx.fillTextDefault = function(text, x, y) {
-            this.save();
-            this.scale(1, -1);
-            this.fillText(text, x, -y);
-            this.restore();
-        };
+        analysis = {};
 
-        // Work out the various vertical dimensions
+        if (canvas.getContext) {
+            ctx = canvas.getContext('2d');
 
-        var symbol_height = 60;
-        var superscript_height = 0;
-        var subscript_height = 0;
-        var margin = 10;
+            // A version for fillText that doesn't mirror
+            ctx.fillTextDefault = function(text, x, y) {
+                this.save();
+                this.scale(1, -1);
+                this.fillText(text, x, -y);
+                this.restore();
+            };
 
-        if (flags.tones) {
-            symbol_height += 50;
-        }
-        if (flags.superscripts) {
-            superscript_height = 25;
-        }
-        if (flags.subscripts) {
-            subscript_height = 25;
-        }
+            // Work out the various vertical dimensions
+            symbol_height = 60;
+            tones = flags.tones;
+            var superscript_height = 0;
+            var subscript_height = 0;
+            var margin = 10;
 
-        // Setup the canvas with +ve y-axis up and y=0 in the centre of
-        // the symbol row
-
-        var canvas_height = (margin + subscript_height +
-                             symbol_height +
-                             superscript_height + margin) * scale;
-        // Distance from top of canvas to the symbol line centre
-        var centre_offset = (symbol_height/2 + superscript_height + 10) * scale;
-
-        canvas.height = canvas_height;
-        ctx.translate(0, centre_offset);
-        ctx.scale(scale, -scale);
-
-        var xpos = 10;
-        var symbol_offset = 0;
-        var annotation = {};
-
-        /// Remove spaces and split into a list of chars
-        var chars = notation.replace(/\s/g, '').split('');
-        var pos = 0;
-
-        while (pos < chars.length) {
-
-            // Capture annotation for the future
-            if (chars[pos] === '"') {
-                pos++;
-                var which = 'sub';
-                var str = '';
-                if (chars[pos] === '_') {
-                    pos++;
-                }
-                if (chars[pos] === '^') {
-                    which = 'sup';
-                    pos++;
-                }
-
-                while (pos < chars.length && chars[pos] !== '"') {
-                    str += chars[pos];
-                    pos++;
-                }
-                annotation[which] = str;
+            if (flags.tones) {
+                symbol_height += 50;
             }
-            // Capture Hi/Mid/Low shifts
-            else if (chars[pos] === '^') {
-                symbol_offset = 25;
-                analysis['tones'] = true;
+            if (flags.superscripts) {
+                superscript_height = 25;
             }
-            else if (chars[pos] === '=') {
-                symbol_offset = 0;
+            if (flags.subscripts) {
+                subscript_height = 25;
             }
 
-            else if (chars[pos] === '_') {
-                symbol_offset = -25;
-                analysis['tones'] = true;
-            }
+            // Setup the canvas with +ve y-axis up and y=0 in the centre of
+            // the symbol row
+            var canvas_height = (margin + subscript_height +
+                                 symbol_height +
+                                 superscript_height + margin) * scale;
+            // Distance from top of canvas to the symbol line centre
+            var centre_offset = (symbol_height/2 + superscript_height + 10) * scale;
 
-            // Otherwise draw things
-            else {
+            canvas.height = canvas_height;
+            ctx.translate(0, centre_offset);
+            ctx.scale(scale, -scale);
 
-                var width = 0;
+            xpos = 10;
+            symbol_offset = 0;
+            var annotation = {};
 
-                if (chars[pos] === 'd') {
-                    width = arrow(false, false, false);
-                }
+            /// Remove spaces and split into a list of chars
+            var chars = notation.replace(/\s/g, '').split('');
+            var pos = 0;
 
-                else if (chars[pos] === 'u') {
-                    width = arrow(true, false, false);
-                }
+            while (pos < chars.length) {
 
-                else if (chars[pos] === 'D') {
-                    width = arrow(false, true, false);
-                }
-
-                else if (chars[pos] === 'U') {
-                    width = arrow(true, true, false);
-                }
-
-                else if (chars[pos] === 's') {
-                    width = stab(false, false);
-                }
-
-                else if (chars[pos] === 'S') {
-                    width = stab(true, false);
-                }
-
-                else if (chars[pos] === '-') {
-                    width = dash();
-                }
-
-                else if (chars[pos] === '|') {
-                    width = bar();
-                }
-
-                else if (chars[pos] === 'z' || chars[pos] === 'Z') {
-                    width = end();
-                }
-
-                else if (chars[pos] === ',') {
-                    width = comma();
-                }
-
-                else if (chars[pos] === '+') {
-                    width = triplet();
-                }
-
-                else if (chars[pos] === '#') {
-                    width = space();
-                }
-
-                else if (chars[pos] === 'b' || chars[pos] === 'B') {
-                    width = negspace();
-                }
-
-                else if (chars[pos] === 'x' || chars[pos] === 'X') {
+                // Capture annotation for the future
+                if (chars[pos] === '"') {
                     pos++;
-                    var count = '';
-                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                        count += chars[pos];
-                        pos ++;
+                    var which = 'sub';
+                    var str = '';
+                    if (chars[pos] === '_') {
+                        pos++;
                     }
-                    width = repeat(count);
-                    pos --;
+                    if (chars[pos] === '^') {
+                        which = 'sup';
+                        pos++;
+                    }
+
+                    while (pos < chars.length && chars[pos] !== '"') {
+                        str += chars[pos];
+                        pos++;
+                    }
+                    annotation[which] = str;
+                }
+                // Capture Hi/Mid/Low shifts
+                else if (chars[pos] === '^') {
+                    symbol_offset = 25;
+                    analysis['tones'] = true;
+                }
+                else if (chars[pos] === '=') {
+                    symbol_offset = 0;
                 }
 
-                else if (chars[pos] === 't' || chars[pos] === 'T') {
-                    var draw = chars[pos] === 'T';
-                    pos++;
-                    var b = '';
-                    var m = '';
-                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                        b += chars[pos];
-                        pos ++;
-                    }
-                    pos++;
-                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                        m += chars[pos];
-                        pos ++;
-                    }
-                    width = tsig(b, m, draw);
-                    pos --;
+                else if (chars[pos] === '_') {
+                    symbol_offset = -25;
+                    analysis['tones'] = true;
                 }
 
+                // Otherwise draw things
                 else {
-                    console.log('Unrecognised character in encoding: ' + chars[pos]);
+
+                    var width = 0;
+
+                    if (chars[pos] === 'd') {
+                        width = arrow(false, false, false);
+                    }
+
+                    else if (chars[pos] === 'u') {
+                        width = arrow(true, false, false);
+                    }
+
+                    else if (chars[pos] === 'D') {
+                        width = arrow(false, true, false);
+                    }
+
+                    else if (chars[pos] === 'U') {
+                        width = arrow(true, true, false);
+                    }
+
+                    else if (chars[pos] === 's') {
+                        width = stab(false, false);
+                    }
+
+                    else if (chars[pos] === 'S') {
+                        width = stab(true, false);
+                    }
+
+                    else if (chars[pos] === '-') {
+                        width = dash();
+                    }
+
+                    else if (chars[pos] === '|') {
+                        width = bar();
+                    }
+
+                    else if (chars[pos] === 'z' || chars[pos] === 'Z') {
+                        width = end();
+                    }
+
+                    else if (chars[pos] === ',') {
+                        width = comma();
+                    }
+
+                    else if (chars[pos] === '+') {
+                        width = triplet();
+                    }
+
+                    else if (chars[pos] === '#') {
+                        width = space();
+                    }
+
+                    else if (chars[pos] === 'b' || chars[pos] === 'B') {
+                        width = negspace();
+                    }
+
+                    else if (chars[pos] === 'x' || chars[pos] === 'X') {
+                        pos++;
+                        var count = '';
+                        while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                            count += chars[pos];
+                            pos ++;
+                        }
+                        width = repeat(count);
+                        pos --;
+                    }
+
+                    else if (chars[pos] === 't' || chars[pos] === 'T') {
+                        var draw = chars[pos] === 'T';
+                        pos++;
+                        var b = '';
+                        var m = '';
+                        while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                            b += chars[pos];
+                            pos ++;
+                        }
+                        pos++;
+                        while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                            m += chars[pos];
+                            pos ++;
+                        }
+                        width = tsig(b, m, draw);
+                        pos --;
+                    }
+
+                    else {
+                        console.log('Unrecognised character in encoding: ' + chars[pos]);
+                    }
+
+                    // Draw pending annotations
+                    if (annotation.sup !== undefined) {
+                        sup(annotation.sup, width);
+                    }
+                    if (annotation.sub !== undefined) {
+                        sub(annotation.sub, width);
+                    }
+                    annotation = {};
+
+                    // Move on drawing position
+                    xpos += width;
+
                 }
 
-                // Draw pending annotations
-                if (annotation.sup !== undefined) {
-                    sup(annotation.sup, width);
-                }
-                if (annotation.sub !== undefined) {
-                    sub(annotation.sub, width);
-                }
-                annotation = {};
-
-                // Move on drawing position
-                xpos += width;
+                pos++;
 
             }
 
-            pos++;
+            analysis['width'] = xpos * scale;
+
+            return analysis;
 
         }
-
-        analysis['width'] = xpos * scale;
-
-        return analysis;
 
     }
 
@@ -379,14 +386,14 @@ function draw_notation(canvas, notation, scale, flags) {
 
     }
 
-    function sub(text, w) {
+    function sub(text, symbol_width) {
 
         ctx.save();
 
         ctx.font = 'italic 20pt Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        ctx.fillTextDefault(text, xpos + w/2, -symbol_height/2 - 8);
+        ctx.fillTextDefault(text, xpos + symbol_width/2, -symbol_height/2 - 8);
 
         ctx.restore();
 
@@ -396,14 +403,14 @@ function draw_notation(canvas, notation, scale, flags) {
 
     }
 
-    function sup(text, w) {
+    function sup(text, symbol_width) {
 
         ctx.save();
 
         ctx.font = 'italic 20pt Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'bottom';
-        ctx.fillTextDefault(text, xpos + w/2, symbol_height/2 + 2);
+        ctx.fillTextDefault(text, xpos + symbol_width/2, symbol_height/2 + 2);
 
         ctx.restore();
 
@@ -473,7 +480,7 @@ function draw_notation(canvas, notation, scale, flags) {
 
     }
 
-    function tsig(beats, measure, actually_draw) {
+    function tsig(beats, measure, draw) {
 
         ctx.save();
 
@@ -485,21 +492,21 @@ function draw_notation(canvas, notation, scale, flags) {
 
         // Widest of '12' and actual beats and measure to promote
         // consistent alignment
-        var w = Math.max(
+        var width = Math.max(
             ctx.measureText('12').width,
             ctx.measureText(beats).width,
             ctx.measureText(measure).width);
 
-        if (actually_draw) {
+        if (draw) {
             ctx.textBaseline = 'alphabetic';
-            ctx.fillTextDefault(beats, xpos + 10 + (w/2), 0);
+            ctx.fillTextDefault(beats, xpos + 10 + (width/2), 0);
             ctx.textBaseline = 'top';
-            ctx.fillTextDefault(measure, xpos + 10 + (w/2), 0);
+            ctx.fillTextDefault(measure, xpos + 10 + (width/2), 0);
         }
 
         ctx.restore();
 
-        return w + 25;
+        return width + 25;
 
     }
 
@@ -510,7 +517,7 @@ function draw_notation(canvas, notation, scale, flags) {
             times = 2;
         }
 
-        var this_width = 0;
+        var width = 0;
 
         // A repeat of less than two makes no sense
         if (times >= 2) {
@@ -536,7 +543,7 @@ function draw_notation(canvas, notation, scale, flags) {
             ctx.lineTo(xpos + 30, 30);
             ctx.stroke();
 
-            this_width = 40;
+            width = 40;
 
             staff_line(40);
 
@@ -546,23 +553,23 @@ function draw_notation(canvas, notation, scale, flags) {
                 ctx.textBaseline = 'middle';
                 var label = '\u00d7' + times;
                 ctx.fillTextDefault('\u00d7' + times, xpos + 45, 0);
-                this_width += ctx.measureText(label).width + 10;
+                width += ctx.measureText(label).width + 10;
             }
 
             ctx.restore();
 
         }
 
-        return this_width;
+        return width;
 
     }
 
-    function staff_line(w) {
+    function staff_line(width) {
 
-        if (flags.tones) {
+        if (tones) {
             ctx.beginPath();
             ctx.moveTo(xpos, 0);
-            ctx.lineTo(xpos+w, 0);
+            ctx.lineTo(xpos+width, 0);
             ctx.strokeStyle = 'black';
             ctx.lineWidth = 1;
             ctx.stroke();
@@ -570,10 +577,12 @@ function draw_notation(canvas, notation, scale, flags) {
 
     }
 
-}
+    function decodeHTMLEntities(text) {
+        var textArea = document.createElement('textarea');
+        textArea.innerHTML = text;
+        return textArea.value;
+    }
 
-function decodeHTMLEntities(text) {
-    var textArea = document.createElement('textarea');
-    textArea.innerHTML = text;
-    return textArea.value;
-}
+    return {display_notation: display_notation};
+
+}());

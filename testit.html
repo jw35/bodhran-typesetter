@@ -7,6 +7,13 @@
 
   <script src="bodhran-typesetter.js"></script>
 
+  <script>
+    document.addEventListener('DOMContentLoaded',  () => {
+      canvas = document.getElementById('notation-one');
+      BodhranTypesetter.display_notation(canvas, 'Dudu, Dudu', 0.6);
+    });
+  </script>
+
   <style type="text/css">
       canvas { border: 1px solid black; } 
   </style>
@@ -108,6 +115,10 @@
    <canvas class="notation">
      T9/8 "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d | "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d |
    </canvas>
+
+   <h2>Manual test</h2>
+
+   <canvas id="notation-one"></canvas>
 
  </body>
 
