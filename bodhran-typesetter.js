@@ -159,6 +159,10 @@ var BodhranTypesetter = (function() {
                         width = bar();
                     }
 
+                    else if (chars[pos] === '!') {
+                        width = double_bar();
+                    }
+
                     else if (chars[pos] === 'z' || chars[pos] === 'Z') {
                         width = end();
                     }
@@ -356,6 +360,30 @@ var BodhranTypesetter = (function() {
         staff_line(30);
 
         return 30;
+
+    }
+
+    function double_bar() {
+
+        ctx.save();
+
+        ctx.strokeStyle = 'black';
+        ctx.lineCap = 'butt';
+        ctx.lineWidth = 4;
+
+        ctx.beginPath();
+        ctx.moveTo(xpos + 15, 30);
+        ctx.lineTo(xpos + 15, -30);
+
+        ctx.moveTo(xpos + 25, 30);
+        ctx.lineTo(xpos + 25, -30);
+        ctx.stroke();
+
+        ctx.restore();
+
+        staff_line(40);
+
+        return 40;
 
     }
 

@@ -61,6 +61,7 @@ U | Strong upstroke
 S | Strong stab
 \- | Dash
 \| | Bar
+! | Thin-thin double bar
 Z or z | Thin-thick double bar ('z' = 'end')
 X or x | Repeat ('x' = 'times')
 X\<n\> or x\<n\> | Repeat **n** times (**n** must be a number)
@@ -72,7 +73,7 @@ T\<b\>/\<u\> | Time signature **b/u** (**b** and **u** must be numbers)
 t\<b\>/\<u\> | Invisible time signature **b/u** (for alignment, **b** and **u** must be numbers)
 "\<text\>" | Display **text** as annotation above or below the next symbol. If text starts '^' it is displayed above; if it starts '_' it is displayed below; if neither then it is currently displayed below.
 ^ | Display following symbols raised
-_ | Display following symbols lowered
+_ | Display following symbols lowered ('underscore', not 'minus')
 = | Display following symbols centred (default)
 
 * There's no attempt to stop annotations overlapping. Further, the triplet notation and
