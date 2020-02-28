@@ -8,237 +8,269 @@
 var BodhranTypesetter = (function() {
 
     document.addEventListener('DOMContentLoaded',  () => {
-        var elements = document.getElementsByTagName('canvas');
-        for(var i = 0; i < elements.length; i++) {
-            if (elements[i].classList.contains('notation')) {
-                var notation = decodeHTMLEntities(elements[i].innerHTML);
-                display_notation(elements[i], notation, 0.6);
-            }
+        var elements = document.getElementsByClassName('notation');
+        for (var i = 0; i < elements.length; i++) {
+            var notation = decodeHTMLEntities(elements[i].innerHTML);
+            display_notation(elements[i], notation, 0.6);
         }
     });
 
 
-    function display_notation(canvas, notation, scale) {
+    // Nasty global state...
+    var ctx, xpos, symbol_offset, symbol_height, tones;
 
-        // Test run to find the width
+
+    function display_notation(element, notation, scale) {
+
+        var lines = notation.split(/\r?\n/);
+
+        // Test run to find the width and features used
         var test_canvas = document.createElement('canvas');
-        var flags = draw_notation(test_canvas, notation, scale, {});
+        ctx = test_canvas.getContext('2d');
+        var max_width = 0;
+        var superscripts = false;
+        var subscripts = false;
+        tones = false;
+        for (var i = 0; i < lines.length; i++) {
+            var flags = draw_notation(notation, scale);
+            max_width = Math.max(max_width, flags.width);
+            superscripts = superscripts || flags.uses_superscript;
+            subscripts = subscripts || flags.uses_subscript;
+            tones = tones || flags.uses_tones;
+        }
 
-        // Live run with the right width
-        canvas.width = flags['width'] + 10;
-        draw_notation(canvas, notation, scale, flags);
+        // Work out the row heights
+        symbol_height = 60;
+        var superscript_height = 0;
+        var subscript_height = 0;
+        var margin = 10;
+        if (tones) {
+            symbol_height += 50;
+        }
+        if (superscripts) {
+            superscript_height = 25;
+        }
+        if (subscripts) {
+            subscript_height = 25;
+        }
+        var row_height = (margin + subscript_height +
+                             symbol_height +
+                             superscript_height + margin) * scale;
+        // Distance from top of canvas to the symbol line centre
+        var centre_offset = (symbol_height/2 + superscript_height + 10) * scale;
+
+        // Prepare the real canvas
+        var canvas = document.createElement('canvas');
+        canvas.height = row_height * lines.length;
+        canvas.width = max_width + 10;
+
+        ctx = canvas.getContext('2d');
+        ctx.scale(scale, -scale);
+        ctx.translate(0, -centre_offset);
+
+        // Live run with the proper canvas
+        for (var j = 0; j < lines.length; j++) {
+            draw_notation(notation, scale);
+            ctx.translate(0, -row_height);
+        }
+
+        element.innerHTML = '';
+        element.appendChild(canvas);
 
     }
 
 
-    // NAsty global state...
-    var ctx, xpos, symbol_offset, symbol_height, analysis, tones;
+    function draw_notation(notation, scale) {
 
+        // A version for fillText that doesn't mirror
+        ctx.fillTextDefault = function(text, x, y) {
+            this.save();
+            this.scale(1, -1);
+            this.fillText(text, x, -y);
+            this.restore();
+        };
 
-    function draw_notation(canvas, notation, scale, flags) {
+        // Work out the various vertical dimensions
 
-        analysis = {};
+        xpos = 10;
+        symbol_offset = 0;
 
-        if (canvas.getContext) {
-            ctx = canvas.getContext('2d');
+        /// Remove spaces and split into a list of chars
+        var chars = notation.replace(/\s/g, '').split('');
+        var pos = 0;
 
-            // A version for fillText that doesn't mirror
-            ctx.fillTextDefault = function(text, x, y) {
-                this.save();
-                this.scale(1, -1);
-                this.fillText(text, x, -y);
-                this.restore();
-            };
+        var uses_superscripts = false;
+        var uses_subscripts = false;
+        var uses_tones = false;
+        var annotation = {};
 
-            // Work out the various vertical dimensions
-            symbol_height = 60;
-            tones = flags.tones;
-            var superscript_height = 0;
-            var subscript_height = 0;
-            var margin = 10;
+        while (pos < chars.length) {
 
-            if (flags.tones) {
-                symbol_height += 50;
-            }
-            if (flags.superscripts) {
-                superscript_height = 25;
-            }
-            if (flags.subscripts) {
-                subscript_height = 25;
-            }
-
-            // Setup the canvas with +ve y-axis up and y=0 in the centre of
-            // the symbol row
-            var canvas_height = (margin + subscript_height +
-                                 symbol_height +
-                                 superscript_height + margin) * scale;
-            // Distance from top of canvas to the symbol line centre
-            var centre_offset = (symbol_height/2 + superscript_height + 10) * scale;
-
-            canvas.height = canvas_height;
-            ctx.translate(0, centre_offset);
-            ctx.scale(scale, -scale);
-
-            xpos = 10;
-            symbol_offset = 0;
-            var annotation = {};
-
-            /// Remove spaces and split into a list of chars
-            var chars = notation.replace(/\s/g, '').split('');
-            var pos = 0;
-
-            while (pos < chars.length) {
-
-                // Capture annotation for the future
-                if (chars[pos] === '"') {
-                    pos++;
-                    var which = 'sub';
-                    var str = '';
-                    if (chars[pos] === '_') {
-                        pos++;
-                    }
-                    if (chars[pos] === '^') {
-                        which = 'sup';
-                        pos++;
-                    }
-
-                    while (pos < chars.length && chars[pos] !== '"') {
-                        str += chars[pos];
-                        pos++;
-                    }
-                    annotation[which] = str;
-                }
-                // Capture Hi/Mid/Low shifts
-                else if (chars[pos] === '^') {
-                    symbol_offset = 25;
-                    analysis['tones'] = true;
-                }
-                else if (chars[pos] === '=') {
-                    symbol_offset = 0;
-                }
-
-                else if (chars[pos] === '_') {
-                    symbol_offset = -25;
-                    analysis['tones'] = true;
-                }
-
-                // Otherwise draw things
-                else {
-
-                    var width = 0;
-
-                    if (chars[pos] === 'd') {
-                        width = arrow(false, false, false);
-                    }
-
-                    else if (chars[pos] === 'u') {
-                        width = arrow(true, false, false);
-                    }
-
-                    else if (chars[pos] === 'D') {
-                        width = arrow(false, true, false);
-                    }
-
-                    else if (chars[pos] === 'U') {
-                        width = arrow(true, true, false);
-                    }
-
-                    else if (chars[pos] === 's') {
-                        width = stab(false, false);
-                    }
-
-                    else if (chars[pos] === 'S') {
-                        width = stab(true, false);
-                    }
-
-                    else if (chars[pos] === '-') {
-                        width = dash();
-                    }
-
-                    else if (chars[pos] === '|') {
-                        width = bar();
-                    }
-
-                    else if (chars[pos] === '!') {
-                        width = double_bar();
-                    }
-
-                    else if (chars[pos] === 'z' || chars[pos] === 'Z') {
-                        width = end();
-                    }
-
-                    else if (chars[pos] === ',') {
-                        width = comma();
-                    }
-
-                    else if (chars[pos] === '+') {
-                        width = triplet();
-                    }
-
-                    else if (chars[pos] === '#') {
-                        width = space();
-                    }
-
-                    else if (chars[pos] === 'b' || chars[pos] === 'B') {
-                        width = negspace();
-                    }
-
-                    else if (chars[pos] === 'x' || chars[pos] === 'X') {
-                        pos++;
-                        var count = '';
-                        while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                            count += chars[pos];
-                            pos ++;
-                        }
-                        width = repeat(count);
-                        pos --;
-                    }
-
-                    else if (chars[pos] === 't' || chars[pos] === 'T') {
-                        var draw = chars[pos] === 'T';
-                        pos++;
-                        var b = '';
-                        var m = '';
-                        while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                            b += chars[pos];
-                            pos ++;
-                        }
-                        pos++;
-                        while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
-                            m += chars[pos];
-                            pos ++;
-                        }
-                        width = tsig(b, m, draw);
-                        pos --;
-                    }
-
-                    else {
-                        console.log('Unrecognised character in encoding: ' + chars[pos]);
-                    }
-
-                    // Draw pending annotations
-                    if (annotation.sup !== undefined) {
-                        sup(annotation.sup, width);
-                    }
-                    if (annotation.sub !== undefined) {
-                        sub(annotation.sub, width);
-                    }
-                    annotation = {};
-
-                    // Move on drawing position
-                    xpos += width;
-
-                }
-
+            // Capture annotation for the future
+            if (chars[pos] === '"') {
                 pos++;
+                var which = 'sub';
+                var str = '';
+                if (chars[pos] === '_') {
+                    pos++;
+                }
+                if (chars[pos] === '^') {
+                    which = 'sup';
+                    pos++;
+                }
+
+                while (pos < chars.length && chars[pos] !== '"') {
+                    str += chars[pos];
+                    pos++;
+                }
+                annotation[which] = str;
+            }
+            // Capture Hi/Mid/Low shifts
+            else if (chars[pos] === '^') {
+                symbol_offset = 25;
+                uses_tones = true;
+            }
+            else if (chars[pos] === '=') {
+                symbol_offset = 0;
+            }
+
+            else if (chars[pos] === '_') {
+                symbol_offset = -25;
+                uses_tones = true;
+            }
+
+            // Otherwise draw things
+            else {
+
+                var width = 0;
+
+                // Down beat
+                if (chars[pos] === 'd') {
+                    width = arrow(false, false, false);
+                }
+
+                // Up beat
+                else if (chars[pos] === 'u') {
+                    width = arrow(true, false, false);
+                }
+
+                // Strong down beat
+                else if (chars[pos] === 'D') {
+                    width = arrow(false, true, false);
+                }
+
+                // Strong up beat
+                else if (chars[pos] === 'U') {
+                    width = arrow(true, true, false);
+                }
+
+                // Stab
+                else if (chars[pos] === 's') {
+                    width = stab(false, false);
+                }
+
+                // Strong stab
+                else if (chars[pos] === 'S') {
+                    width = stab(true, false);
+                }
+
+                // Dash
+                else if (chars[pos] === '-') {
+                    width = dash();
+                }
+
+                // Bar
+                else if (chars[pos] === '|') {
+                    width = bar();
+                }
+
+                // Double bar
+                else if (chars[pos] === '!') {
+                    width = double_bar();
+                }
+
+                // Thin-thick bar
+                else if (chars[pos] === 'z' || chars[pos] === 'Z') {
+                    width = end();
+                }
+
+                // Comma
+                else if (chars[pos] === ',') {
+                    width = comma();
+                }
+
+                // Triplet
+                else if (chars[pos] === '+') {
+                    width = triplet();
+                    uses_superscripts = true;
+                }
+
+                // Half-width space
+                else if (chars[pos] === '#') {
+                    width = space();
+                }
+
+                // Half-width negative space
+                else if (chars[pos] === 'b' || chars[pos] === 'B') {
+                    width = negspace();
+                }
+
+                // Repeat
+                else if (chars[pos] === 'x' || chars[pos] === 'X') {
+                    pos++;
+                    var count = '';
+                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                        count += chars[pos];
+                        pos ++;
+                    }
+                    width = repeat(count);
+                    pos --;
+                }
+
+                // Time signature
+                else if (chars[pos] === 't' || chars[pos] === 'T') {
+                    var draw = chars[pos] === 'T';
+                    pos++;
+                    var b = '';
+                    var m = '';
+                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                        b += chars[pos];
+                        pos ++;
+                    }
+                    pos++;
+                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                        m += chars[pos];
+                        pos ++;
+                    }
+                    width = tsig(b, m, draw);
+                    pos --;
+                }
+
+                else {
+                    console.log('Unrecognised character in encoding: ' + chars[pos]);
+                }
+
+                // Draw pending annotations
+                if (annotation.sup !== undefined) {
+                    sup(annotation.sup, width);
+                    uses_superscripts = true;
+                }
+                if (annotation.sub !== undefined) {
+                    sub(annotation.sub, width);
+                    uses_subscripts = true;
+                }
+                annotation = {};
+
+                // Move on drawing position
+                xpos += width;
 
             }
 
-            analysis['width'] = xpos * scale;
-
-            return analysis;
+            pos++;
 
         }
+
+        return { width: width*scale, uses_superscripts, uses_subscripts, uses_tones };
 
     }
 
@@ -425,8 +457,6 @@ var BodhranTypesetter = (function() {
 
         ctx.restore();
 
-        analysis['subscripts'] = true;
-
         return 0;
 
     }
@@ -441,8 +471,6 @@ var BodhranTypesetter = (function() {
         ctx.fillTextDefault(text, xpos + symbol_width/2, symbol_height/2 + 2);
 
         ctx.restore();
-
-        analysis['superscripts'] = true;
 
         return 0;
 
@@ -484,8 +512,6 @@ var BodhranTypesetter = (function() {
         ctx.stroke();
 
         ctx.restore();
-
-        analysis['superscripts'] = true;
 
         return 0;
 
