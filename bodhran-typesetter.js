@@ -336,7 +336,7 @@ var BodhranTypesetter = (function() {
 
         var delta = 16;
         if (wide) {
-            delta = 26;
+            delta = 23;
         }
         ctx.beginPath();
         ctx.moveTo(0, delta);
