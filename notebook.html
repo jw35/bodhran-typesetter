@@ -11,54 +11,58 @@
       /* canvas { border: 1px solid black; } */
       html, body  { font-family: Arial, Helvetica, sans-serif; }
       .together { break-inside: avoid; }
-      h1, h2 { text-align: center; }
+      h1 { text-align: center; border-top: 3px solid black; padding-top: 1em; font-size: 2em;}
+      h2 { margin: 1em 0;}
+      canvas { display: block; margin: 1em 0; }
   </style>
 
  </head>
 
  <body>
 
-  <h1>Jon's Bodhr&aacute;n rhythm notebook</h1>
+  <!-- ========================================================== -->
 
-  <h2>4/4 Reels</h2>
+  <div class="together">
 
-   <h3>On beat:</h3>
+  <h1>4/4 Reels</h1>
+
+   <h2>On beat:</h2>
 
    <canvas class="notation">
      Dudu, Dudu |
    </canvas>
 
-   <h3>Off beat:</h3>
+   <h2>Off beat:</h2>
 
    <canvas class="notation">
      duDu, duDu |
    </canvas>
 
-   <h3>Stab, down, up, stab</h3>
+   <h2>Stab, down, up, stab</h2>
 
    <canvas class="notation">
      Dudu, Dudu | Sdus, Dudu  x
    </canvas>
 
-   <h3>Double-down, up, down, up</h3>
+   <h2>Double-down, up, down, up</h2>
 
    <canvas class="notation">
      Dudu, Dudu | Dbdbudu, Dudu x
    </canvas>
 
-   <h3>Triplet, down, up</h3>
+   <h2>Triplet, down, up</h2>
 
    <canvas class="notation">
      Dudu, Dudu | D+udu, Dudu x
    </canvas>
 
-   <h3>Skipping beets:</h3>
+   <h2>Skipping beats:</h2>
 
    <canvas class="notation">
      D-d-, D-d- | Dudu, D-d- |
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
      D-du,D-ud | Dud-,Dud- |
@@ -76,7 +80,7 @@
      Dudu,D-du | Dudu,Dud- |
    </canvas>
 
-   <h3>Roll patterns</h3>
+   <h2>Roll patterns</h2>
 
    <canvas class="notation">
     D+udu, Dudu | Dud+u, DuDu |
@@ -86,7 +90,7 @@
     Dudu, D+udu | Dudu, Dud+u |
    </canvas>
 
-   <h3>All together</h3>
+   <h2>All together</h2>
 
    <canvas class="notation">
     _D=udu, _D=udu | _D=udu, _D=ud+u x3
@@ -96,44 +100,44 @@
     ^Dudu, =Dudu | _Dudu, D - - - !
    </canvas>
 
-   <h3>Syncopated:</h3>
+   <h2>Syncopated:</h2>
 
    <canvas class="notation">
     "GAL-"D"lop-"u"ping"s "GAL-"D"lop-"u"ping"s "COF-"D"fee"u x3 Dus Dus D - !
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
     "DOWN"D "and"u "ah"d "UP"U "and"d "ah"u "DOWN"D "and"u x3 Dud Dud D - !
    </canvas>
 
+ </div>
+
+  <!-- ========================================================== -->
+
   <div class="together">
 
-  <h2>6/8 Jigs</h2>
+  <h1>6/8 Jigs</h1>
 
    <canvas class="notation">
     "RA-"D"shers"u"and"d, "SAU-"U"sa-"d"ges"u x3
     "BA-"D"con"u"and"d, "EGGS"D-- !
    </canvas>
 
-   <h3>Rolls</h3>
+   <h2>Rolls</h2>
 
    <canvas class="notation">
     Dud, Udu x3 D+ud, D-- !
    </canvas>
 
-</div>
-
-   <h3>Skipping beats:</h3>
+   <h2>Skipping beats:</h2>
 
    <canvas class="notation">
      D-d, Udu |  Dud, U-u | D-d ,U-u |
    </canvas>
 
- </div>
-
-   <h3>All together</h3>
+   <h2>All together</h2>
 
    <canvas class="notation">
     _D=ud, Udu | _D=ud, Udu |
@@ -148,13 +152,19 @@
     ^Dud, =Udu | _Dud, U-- !
    </canvas>
 
-<h2>4/4 Hornpipe</h2>
+  </div>
+
+  <!-- ========================================================== -->
+
+  <div class="together">
+
+<h1>4/4 Hornpipe</h1>
 
    <canvas class="notation">
     "DAT"D-"de"d"dat"u | "in"d"a"u"dat"d- | "de"d"dat"u"in"d"a"u |
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
     D-d-D-d- | D-d-Dudu X3 
@@ -163,7 +173,7 @@
    D-d-Dudu | DDD- !
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
     D-d-D-d- | D-d-Dbdbudu X3 
@@ -172,27 +182,31 @@
    D-d-Dbdbudu | DDD- !
    </canvas>
 
-   <div class="together">
+  </div>
 
-<h2>2/4 Polka</h2>
+  <!-- ========================================================== -->
+
+  <div class="together">
+
+<h1>2/4 Polka</h1>
 
    <canvas class="notation">
      "DAT"D-"did-"d"dle"+"a"u, "dat"d-"dat"d- | "DAT"D-"did-"d"dle"+"a"u, "dat"d-"dat"d- |
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
     U-ud, udu-|U-ud, udu-|
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
     du du, du dbdbu | dudu, du d- |
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
     D#db us, Ss s- |
@@ -200,9 +214,11 @@
 
 </div>
 
+  <!-- ========================================================== -->
+
   <div class="together">
 
-  <h2>2/4 March</h2>
+  <h1>2/4 March</h1>
 
    <canvas class="notation">
     "DRUM"D-"there's"d"a"u"drum"d-"there's"d"a"u | "big"d-"big"d-"drum"d-"kit"d- |
@@ -210,34 +226,42 @@
 
 </div>
 
-   <h2>12/8 Slide</h2>
+  <!-- ========================================================== -->
+
+  <div class="together">
+
+   <h1>12/8 Slide</h1>
 
    <canvas class="notation">
     "DAT"D "in"u "a"d "dat"u "in"d "a"u "did-"d "dle"+ "in"u "a"d "dat"u "in"d "a"u |
    </canvas>
 
-  <h2>9/8 Slip jigs</h2>
+  </div>
+
+  <!-- ========================================================== -->
+
+  <div class="together">
+
+  <h1>9/8 Slip jigs</h1>
 
    <canvas class="notation">
      "DOWN"D-"down"d"up"u"down"d"up"u"down"d"up"u"down"d | "UP"U-"up"u"down"d"up"u"down"d"up"u"down"d"up"u |
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
     _"DOWN"D="up"u"down"d ^"UP"U="down"d"up"u ^"DOWN"D="up"u"down"d |
     _"UP"U="down"d"up"u ^"DOWN"D="up"u"down"d ^"UP"U="down"d"up"u |
    </canvas>
 
-   <h3></h3>
+   <h2></h2>
 
    <canvas class="notation">
      "DOWN"D-"down"d"down"d"up"u"down"d"down"d"up"u"down"d | "DOWN"D-"down"d"down"d"up"u"down"d"down"d"up"u"down"d |
    </canvas>
 
-   <canvas class="notation">
-   </canvas>
-
+   </div>
 
  </body>
 
