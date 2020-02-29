@@ -15,7 +15,7 @@
   </script>
 
   <style type="text/css">
-      div { border: 1px solid black; } 
+      canvas { border: 1px solid black; } 
   </style>
 
  </head>
@@ -32,15 +32,11 @@
      dudu
   </div>
 
-  <br>
-
   <p>Just superscripts:</p>
 
   <div class="notation">
      "^Sup"dudu
   </div>
-
-  <br>
 
   <p>Just subscripts:</p>
 
@@ -48,22 +44,17 @@
      "_Sub"d"Sub"udu
   </div>
 
-  <br>
-
   <p>Superscripts and subscripts:</p>
 
   <div class="notation">
      "_Sub"d"^Sup"udu
   </div>
 
-  <br>
   <p>Just triplets:</p>
 
   <div class="notation">
      d+udu
   </div>
-
-  <br>
 
   <p>High and Low tones:</p>
 
@@ -71,22 +62,17 @@
      ^d=u_d=u
   </div>
 
-  <br>
-
   <p>Everything:</p>
 
   <div class="notation">
      ^"^Sup"d=u_d"_Sub"+=u
   </div>
 
-
   <h2>Available symbols</h2>
 
    <div class="notation">
      T4/4 "^1""_Ma"d "^2""_ma"u "^3""_Pa"D "^4""_pa"U | d+u,D+U | s - S - x ^d=u_d=u ! dbdbu ## d  z
-   </div>
 
-   <div class="notation">
      t12/8 ^"^1"D ="^2"u _"^3"d | ^"_DOWN"D ="_up"u _"_down"d | ^"DOWN"D "up"=u _"down"d x3
    </div>
 
@@ -100,10 +86,8 @@
 
    <div class="notation">
      T4/4 D-d-, d-d- | Dudu, d-d- x3
-   </div>
 
-   <div class="notation">
-     T4/4 D-d-, dudu | Sdus, D--- Z
+     t4/4 D-d-, dudu | Sdus, D--- Z
    </div>
 
   <h2>Slip jigs</h2>
@@ -112,6 +96,8 @@
      T9/8 "^DOWN"D-"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d | "^UP"U-"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u |
    </div>
 
+   <h3></h3>
+
    <div class="notation">
      T9/8 "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d | "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d |
    </div>
@@ -119,6 +105,12 @@
    <h2>Manual test</h2>
 
    <div id="notation-one"></div>
+
+   <h2>Spans, not divs</h2>
+
+   <p>
+    <span class="notation">D</span><span class="notation">U</span>
+  </p>
 
  </body>
 

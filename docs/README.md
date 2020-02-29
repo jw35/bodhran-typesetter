@@ -7,9 +7,6 @@ pages. Using this it's fairly easy to produce things like this:
 
 Further live examples at https://jw35.github.io/bodhran-typesetter/
 
-This is really intended for displaying short snippets - while you could use
-it to create longer examples this would quickly become tedious.
-
 ## Usage
 
 1. Include `bodhran-typesetter.js` in you html page:
@@ -18,36 +15,43 @@ it to create longer examples this would quickly become tedious.
     <script src="bodhran-typesetter.js"></script>
 ```
 
-2. Add one or more HTML `<canvas>` elements to your page with
-   `class="notation"`:
+2. Add one or more HTML elements to your page with
+   `class="notation"` (both block-level elements like `<div>`
+   	and in-line elements like `<span>` should work:
 
 ```
-    <canvas class="notation">
-    </canvas>
+    <div class="notation">
+    </div>
 ```
 
-3. Make the body of the canvas a notation string as described below:
+3. Make the body of the element a notation string as described below:
 
 ```
-    <canvas class="notation">
+    <div class="notation">
        Dudu, Dudu |
-    </canvas>
+    </div>
 ```
 
-The Javascript will process each such canvas, set its height and width
+The Javascript will process each such element, replace its content with
+a canvas element of the appropriate height and width,
 and draw an appropriate diagram on it.
 
-If you don't like the way this automatically locates canvases to process
-and reads the notation out of their bodies then you can create plain
-canvases without `class="notation"` and then pass each one along with a notation
+If you don't like the way this automatically locates elements to process
+and reads the notation out of their bodies then you can elements
+without `class="notation"` and pass them along with a notation
 string and a scale factor to `BodhranTypesetter.display_notation(canvas, notation, scale)`.
 
 ## Notation
 
-Notations consist of a string of characters in a scheme vaguely
-inspired by [ABC Notation](http://abcnotation.com/). Whitespace is
-ignored in notations and can be used freely to improve
-readability.
+Notations consist of characters in a scheme vaguely
+inspired by [ABC Notation](http://abcnotation.com/).
+
+A line break in the input produces a line break in the generated output and
+there's no way to escape this. White space and blank lines are otherwise
+ignored in notations and can be used freely to improve readability. There's no
+line or page wrapping - the canvas element will be made as wide and as high as
+is needed to display the notation provided. How this will display or print is
+up to the browser.
 
 The characters recognised in the notation are:
 
@@ -78,10 +82,6 @@ _ | Display following symbols lowered ('underscore', not 'minus')
 
 * There's no attempt to stop annotations overlapping. Further, the triplet notation and
 annotations above the symbols use the same space and so can't be used together.
-
-* There's no line wrapping - the canvas element will be made as long as is needed to
-display the notation provided on a single line. How this will display or print is up to the browser.
-This all works best for short notation fragments.
 
 * If any symbols are raised or lowered then a centerline is automatically drawn
 to make it easier to see their relationship.

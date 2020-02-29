@@ -30,13 +30,18 @@ var BodhranTypesetter = (function() {
         var max_width = 0;
         var superscripts = false;
         var subscripts = false;
+        var n_lines = 0;
         tones = false;
         for (var i = 0; i < lines.length; i++) {
-            var flags = draw_notation(notation, scale);
+            if (lines[i].match(/^\s*$/)) {
+                continue;
+            }
+            var flags = draw_notation(lines[i]);
             max_width = Math.max(max_width, flags.width);
-            superscripts = superscripts || flags.uses_superscript;
-            subscripts = subscripts || flags.uses_subscript;
+            superscripts = superscripts || flags.uses_superscripts;
+            subscripts = subscripts || flags.uses_subscripts;
             tones = tones || flags.uses_tones;
+            n_lines += 1;
         }
 
         // Work out the row heights
@@ -44,25 +49,26 @@ var BodhranTypesetter = (function() {
         var superscript_height = 0;
         var subscript_height = 0;
         var margin = 10;
+        var gutter = 20;
         if (tones) {
             symbol_height += 50;
         }
         if (superscripts) {
-            superscript_height = 25;
+            superscript_height = 30;
         }
         if (subscripts) {
-            subscript_height = 25;
+            subscript_height = 30;
         }
         var row_height = (margin + subscript_height +
-                             symbol_height +
-                             superscript_height + margin) * scale;
-        // Distance from top of canvas to the symbol line centre
-        var centre_offset = (symbol_height/2 + superscript_height + 10) * scale;
+                          symbol_height +
+                          superscript_height + margin);
+        // Distance from top of row to the symbol line centre
+        var centre_offset = (symbol_height/2 + superscript_height + margin);
 
         // Prepare the real canvas
         var canvas = document.createElement('canvas');
-        canvas.height = row_height * lines.length;
-        canvas.width = max_width + 10;
+        canvas.height = ((row_height * n_lines) + (gutter * (n_lines-1))) * scale;
+        canvas.width = (max_width + 10) * scale;
 
         ctx = canvas.getContext('2d');
         ctx.scale(scale, -scale);
@@ -70,8 +76,11 @@ var BodhranTypesetter = (function() {
 
         // Live run with the proper canvas
         for (var j = 0; j < lines.length; j++) {
-            draw_notation(notation, scale);
-            ctx.translate(0, -row_height);
+            if (lines[j].match(/^\s*$/)) {
+                continue;
+            }
+            draw_notation(lines[j]);
+            ctx.translate(0, -(row_height+gutter));
         }
 
         element.innerHTML = '';
@@ -80,7 +89,7 @@ var BodhranTypesetter = (function() {
     }
 
 
-    function draw_notation(notation, scale) {
+    function draw_notation(line) {
 
         // A version for fillText that doesn't mirror
         ctx.fillTextDefault = function(text, x, y) {
@@ -96,7 +105,7 @@ var BodhranTypesetter = (function() {
         symbol_offset = 0;
 
         /// Remove spaces and split into a list of chars
-        var chars = notation.replace(/\s/g, '').split('');
+        var chars = line.replace(/\s/g, '').split('');
         var pos = 0;
 
         var uses_superscripts = false;
@@ -270,7 +279,7 @@ var BodhranTypesetter = (function() {
 
         }
 
-        return { width: width*scale, uses_superscripts, uses_subscripts, uses_tones };
+        return { width: xpos, uses_superscripts, uses_subscripts, uses_tones };
 
     }
 
@@ -502,13 +511,16 @@ var BodhranTypesetter = (function() {
         ctx.font = 'bold italic 20pt Arial';
         ctx.textAlign = 'center';
 
-        ctx.fillTextDefault('T', xpos, symbol_height/2);
+        var height = symbol_height/2 + 10;
+
+
+        ctx.fillTextDefault('T', xpos, height);
 
         ctx.beginPath();
-        ctx.moveTo(xpos - 7, (symbol_height/2)+8);
-        ctx.quadraticCurveTo(xpos - 37, (symbol_height/2)+8, xpos - 40, (symbol_height/2));
-        ctx.moveTo(xpos + 7, (symbol_height/2)+8);
-        ctx.quadraticCurveTo(xpos + 37, (symbol_height/2)+8, xpos + 40, (symbol_height/2));
+        ctx.moveTo(xpos - 7, height+8);
+        ctx.quadraticCurveTo(xpos - 37, height+8, xpos - 40, height);
+        ctx.moveTo(xpos + 7, height+8);
+        ctx.quadraticCurveTo(xpos + 37, height+8, xpos + 40, height);
         ctx.stroke();
 
         ctx.restore();
