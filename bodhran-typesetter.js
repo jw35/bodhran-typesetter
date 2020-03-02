@@ -14,12 +14,14 @@ var BodhranTypesetter = (function() {
     var TSIG_HEIGHT = 14;             // Extra height/depth needed for tsigs
     var GUTTER_HEIGHT = 20;           // Space between consecutive lines
 
+    var scale_factor = 0.5;
+
     document.addEventListener('DOMContentLoaded',  () => {
         // make a static array because we add <canvas> element with class 'notation'...
         var elements = Array.prototype.slice.call(document.getElementsByClassName('notation'));
         for (var i = 0; i < elements.length; i++) {
             var notation = decodeHTMLEntities(elements[i].innerHTML);
-            display_notation(elements[i], notation, 0.4);
+            display_notation(elements[i], notation, BodhranTypesetter.scale_factor);
         }
     });
 
@@ -37,8 +39,10 @@ var BodhranTypesetter = (function() {
             // Get the width, height and depth metrics for every line
             var metrics = analyse(lines);
 
-            // Find maximum line height (up + doww + gutter)
-            var line_height = metrics.map(m => m.up + m.down + GUTTER_HEIGHT).reduce((a, b) => Math.max(a, b));
+            // Find maximum line height (max(up) + max(down) + gutter)
+            var line_height = metrics.map(m => m.up).reduce((a, b) => Math.max(a, b)) +
+                              metrics.map(m => m.down).reduce((a, b) => Math.max(a, b)) +
+                              GUTTER_HEIGHT;
 
             // Canvas height = line[1] 'up' + n-1 line height + line[n] down
             var height = metrics[0].up + (line_height * (lines.length-1)) + metrics[metrics.length-1].down;
@@ -661,9 +665,9 @@ var BodhranTypesetter = (function() {
 
             if (draw) {
                 ctx.textBaseline = 'alphabetic';
-                ctx.fillTextDefault(beats, xpos + (semi_width), 0);
+                ctx.fillTextDefault(beats, xpos + (semi_width), 2);
                 ctx.textBaseline = 'top';
-                ctx.fillTextDefault(measure, xpos + (semi_width), 0);
+                ctx.fillTextDefault(measure, xpos + (semi_width), 2);
             }
 
             ctx.restore();
@@ -696,6 +700,6 @@ var BodhranTypesetter = (function() {
         return textArea.value;
     }
 
-    return {display_notation: display_notation};
+    return {display_notation, scale_factor};
 
 }());
