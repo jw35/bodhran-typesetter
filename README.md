@@ -37,7 +37,7 @@ a canvas element and draw an appropriate diagram on it.
 
 The canvas is sized to more-or-less exactly hold the diagram with no margin
 around it. You will probably want to add some padding or margins either to to canvas itself or
-to an element containing it. The canvas is tagged with `class="notation"` so
+to an element containing it. The canvas is tagged with `class="diagram"` so
 it can be targeted with CSS.
 
 You can alter the overall size of the notation diagram by assigning to

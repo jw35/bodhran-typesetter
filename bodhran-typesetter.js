@@ -17,8 +17,7 @@ var BodhranTypesetter = (function() {
     var scale_factor = 0.5;
 
     document.addEventListener('DOMContentLoaded',  () => {
-        // make a static array because we add <canvas> element with class 'notation'...
-        var elements = Array.prototype.slice.call(document.getElementsByClassName('notation'));
+        var elements = document.getElementsByClassName('notation');
         for (var i = 0; i < elements.length; i++) {
             var notation = decodeHTMLEntities(elements[i].innerHTML);
             display_notation(elements[i], notation, BodhranTypesetter.scale_factor);
@@ -56,7 +55,7 @@ var BodhranTypesetter = (function() {
             // Prepare the real canvas
 
             var canvas = document.createElement('canvas');
-            canvas.classList.add('notation');
+            canvas.classList.add('diagram');
             canvas.height = height * scale;
             canvas.width = width * scale;
 
