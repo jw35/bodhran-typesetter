@@ -432,7 +432,7 @@ var BodhranTypesetter = (function() {
 
             ctx.restore();
 
-            staff_line(30);
+            staff_line(40);
 
             return 40;
 
