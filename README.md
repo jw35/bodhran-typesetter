@@ -3,7 +3,7 @@
 Some Javascript for including Bodhrán sticking and rhythm diagrams on web
 pages. Using this it's fairly easy to produce things like this:
 
-![example pattern](example.png)
+![example pattern](docs/example.png)
 
 Further live examples at https://jw35.github.io/bodhran-typesetter/
 
@@ -54,9 +54,9 @@ At a scale factor of 1.0, the arrows in the diagrams are about 60px high.
 The default scale factor is 0.5.
 
 If you don't like the way this automatically locates elements to process
-and reads the notation out of their bodies then you can just create elements
-without `class="notation"` and pass them along with a notation
-string and a scale factor to `BodhranTypesetter.display_notation(canvas, notation, scale_factor)`.
+and reads the notation out of their bodies then you can just create your own canvas
+elements and pass them along with notation
+strings and a scale factors to `BodhranTypesetter.display_notation(canvas, notation, scale_factor)`.
 
 ## Notation
 
