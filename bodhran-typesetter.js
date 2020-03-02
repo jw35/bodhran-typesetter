@@ -11,7 +11,7 @@ var BodhranTypesetter = (function() {
         var elements = document.getElementsByClassName('notation');
         for (var i = 0; i < elements.length; i++) {
             var notation = decodeHTMLEntities(elements[i].innerHTML);
-            display_notation(elements[i], notation, 0.6);
+            display_notation(elements[i], notation, 0.4);
         }
     });
 
