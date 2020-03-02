@@ -588,7 +588,7 @@ var BodhranTypesetter = (function() {
 
             ctx.font = 'bold italic 30pt sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillTextDefault(',', xpos+10, -SYMBOL_HEIGHT/2);
+            ctx.fillTextDefault(',', xpos+10, -SYMBOL_HEIGHT/2+6);
 
             ctx.restore();
 
