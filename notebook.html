@@ -6,6 +6,9 @@
   <meta charset="utf-8"/>
 
   <script src="bodhran-typesetter.js"></script>
+  <script>
+    BodhranTypesetter.scale_factor = 0.4;
+  </script>
 
   <style type="text/css">
       /* canvas { border: 1px solid black; } */
@@ -13,7 +16,10 @@
       .together { break-inside: avoid; }
       h1 { text-align: center; border-top: 3px solid black; padding-top: 1em; font-size: 2em;}
       h2 { margin: 1em 0;}
-      canvas { display: block; margin: 1em 0; }
+      /* canvas { display: block; margin: 1em 0; } */
+
+      canvas.notation { background-color: #eee; margin-left: 20px; padding: 1em;}
+      div.notation { margin-bottom: 5px; }
   </style>
 
  </head>
@@ -56,21 +62,10 @@
      D-d-, D-d- | Dudu, D-d- |
    </div>
 
-   <p></p>
-
    <div class="notation">
      D-du,D-ud | Dud-,Dud- |
-   </div>
-
-   <div class="notation">
      Dud-,D-du | D-ud,Udu- |
-   </div>
-
-   <div class="notation">
      D-du,Dudu | Dud-,Dudu |
-   </div>
-
-   <div class="notation">
      Dudu,D-du | Dudu,Dud- |
    </div>
 

@@ -8,6 +8,7 @@
   <script src="bodhran-typesetter.js"></script>
 
   <script>
+    BodhranTypesetter.scale_factor = 0.5;
     document.addEventListener('DOMContentLoaded',  () => {
       div = document.getElementById('notation-one');
       BodhranTypesetter.display_notation(div, 'Dudu, Dudu', 0.6);
@@ -15,7 +16,8 @@
   </script>
 
   <style type="text/css">
-      canvas { border: 1px solid black; } 
+      canvas.notation { background-color: pink; margin-left: 20px;}
+      div.notation { margin-bottom: 30px; }
   </style>
 
  </head>
@@ -87,6 +89,13 @@
      _d=u_d=u
   </div>
 
+  <p>Two line, lows folowied by highs:</p>
+
+  <div class="notation">
+     _d=u_d=u
+     ^d=u^d=u
+  </div>
+
   <p>Bar lign alignment:</p>
 
   <div class="notation">
@@ -116,8 +125,6 @@
      T4/4 Dudu, Dudu | duDu, duDu |
    </div>
 
-   <h3></h3>
-
    <div class="notation">
      T4/4 D-d-, d-d- | Dudu, d-d- x3
 
@@ -129,8 +136,6 @@
    <div class="notation">
      T9/8 "^DOWN"D-"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d | "^UP"U-"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u"^Down"d"^Up"u |
    </div>
-
-   <h3></h3>
 
    <div class="notation">
      T9/8 "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d | "^DOWN"D-"^Down"d"^Down"d"^Up"u"^Down"d"^Down"d"^Up"u"^Down"d |

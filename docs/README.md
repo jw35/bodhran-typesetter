@@ -33,13 +33,30 @@ Further live examples at https://jw35.github.io/bodhran-typesetter/
 ```
 
 The Javascript will process each such element, replace its content with
-a canvas element of the appropriate height and width,
-and draw an appropriate diagram on it.
+a canvas element and draw an appropriate diagram on it.
+
+The canvas is sized to more-or-less exactly hold the diagram with no margin
+around it. You will probably want to add some padding or margins either to to canvas itself or
+to an element containing it. The canvas is tagged with `class="notation"` so
+it can be targeted with CSS.
+
+You can alter the overall size of the notation diagram by assigning to
+`BodhranTypesetter.scale_factor`, after loading `bodhran-typesetter.js`. e.g.
+
+```
+    <script src="bodhran-typesetter.js"></script>
+    <script>
+        BodhranTypesetter.scale_factor = 0.5;
+    </script>
+```
+
+At a scale factor of 1.0, the arrows in the diagrams are about 60px high.
+The default scale factor is 0.5.
 
 If you don't like the way this automatically locates elements to process
-and reads the notation out of their bodies then you can elements
+and reads the notation out of their bodies then you can just create elements
 without `class="notation"` and pass them along with a notation
-string and a scale factor to `BodhranTypesetter.display_notation(canvas, notation, scale)`.
+string and a scale factor to `BodhranTypesetter.display_notation(canvas, notation, scale_factor)`.
 
 ## Notation
 
