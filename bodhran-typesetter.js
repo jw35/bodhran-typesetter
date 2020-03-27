@@ -1,4 +1,4 @@
-/* eslint  max-lines-per-function: ["warn", 600], no-console: "off" */
+/* eslint  max-lines-per-function: ["warn", 700], no-console: "off" */
 
 /*jslint browser: true */
 /*jshint esversion: 6 */
@@ -267,6 +267,11 @@ var BodhranTypesetter = (function() {
                     pos --;
                 }
 
+                // Start of repeat block
+                else if (chars[pos] === ':') {
+                    width = repeat_start();
+                }
+
                 // Time signature
                 else if (chars[pos] === 't' || chars[pos] === 'T') {
                     var draw_tsig = chars[pos] === 'T';
@@ -489,6 +494,43 @@ var BodhranTypesetter = (function() {
 
         }
 
+
+        function repeat_start() {
+
+            ctx.save();
+
+            ctx.strokeStyle = 'black';
+            ctx.lineCap = 'butt';
+
+            ctx.beginPath();
+            ctx.lineWidth = 6;
+            ctx.moveTo(xpos + 15, -30);
+            ctx.lineTo(xpos + 15, 30);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.lineWidth = 4;
+            ctx.moveTo(xpos + 25, -30);
+            ctx.lineTo(xpos + 25, 30);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(xpos + 35, 10, 3, 0, Math.PI*2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(xpos + 35, -10, 3, 0, Math.PI*2);
+            ctx.fill();
+
+            ctx.restore();
+
+            staff_line(40);
+
+            return 40;
+
+        }
+
+
         function repeat(times) {
 
             if (!times) {
@@ -503,7 +545,6 @@ var BodhranTypesetter = (function() {
                 ctx.save();
 
                 ctx.strokeStyle = 'black';
-                ctx.lineWidth = 4;
                 ctx.lineCap = 'butt';
 
                 ctx.beginPath();
@@ -515,8 +556,13 @@ var BodhranTypesetter = (function() {
                 ctx.fill();
 
                 ctx.beginPath();
+                ctx.lineWidth = 4;
                 ctx.moveTo(xpos + 15, -30);
                 ctx.lineTo(xpos + 15, 30);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.lineWidth = 6;
                 ctx.moveTo(xpos + 25, -30);
                 ctx.lineTo(xpos + 25, 30);
                 ctx.stroke();
@@ -541,6 +587,7 @@ var BodhranTypesetter = (function() {
             return symbol_width;
 
         }
+
 
         function sup(text, symbol_width) {
 

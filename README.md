@@ -84,8 +84,9 @@ S | Strong stab
 \| | Bar
 ! | Thin-thin double bar
 Z or z | Thin-thick double bar ('z' = 'end')
-X or x | Repeat ('x' = 'times')
-X\<n\> or x\<n\> | Repeat **n** times (**n** must be a number)
+: | Start repeat
+X or x | End repeat ('x' = 'times')
+X\<n\> or x\<n\> | End repeat **n** times (**n** must be a number)
 , | Comma
 \# | Half-width space
 b | Negative half-width space ('b' = 'back')
