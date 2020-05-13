@@ -49,8 +49,8 @@ var BodhranTypesetter = (function() {
             var width = metrics.map(m => m.width).reduce((a, b) => Math.max(a, b));
 
             // Does this notation use tones?
-            var uses_hitones = metrics.map(m => m.hitones).indexOf(true) !== -1;
-            var uses_lotones = metrics.map(m => m.lotones).indexOf(true) !== -1;
+            var uses_tones = (metrics.map(m => m.hitones).indexOf(true) !== -1) ||
+                             (metrics.map(m => m.lotones).indexOf(true) !== -1);
 
             // Prepare the real canvas
 
@@ -67,7 +67,7 @@ var BodhranTypesetter = (function() {
 
             // Live run with the proper canvas
             for (var i = 0; i < lines.length; i++) {
-                draw_one_line(ctx, lines[i], uses_hitones, uses_lotones);
+                draw_one_line(ctx, lines[i], uses_tones, metrics[i].hitones, metrics[i].lotones);
                 ctx.translate(0, -line_height);
             }
 
@@ -119,7 +119,7 @@ var BodhranTypesetter = (function() {
     }
 
 
-    function draw_one_line(ctx, line, uses_hitones, uses_lotones) {
+    function draw_one_line(ctx, line, uses_tones, uses_hitones, uses_lotones) {
 
         // A version for fillText that doesn't mirror
         ctx.fillTextDefault = function(text, x, y) {
@@ -724,7 +724,7 @@ var BodhranTypesetter = (function() {
 
         function staff_line(line_width) {
 
-            if (uses_hitones || uses_lotones) {
+            if (uses_tones) {
                 ctx.beginPath();
                 ctx.moveTo(xpos, 0);
                 ctx.lineTo(xpos+line_width, 0);
