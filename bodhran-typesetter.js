@@ -257,7 +257,7 @@ var BodhranTypesetter = (function() {
 
                 // 2/3-width negative space
                 else if (chars[pos] === '3') {
-                    width = negspace((2 * 80) / 3);
+                    width = negspace(80 / 3);
                 }
 
                 // Repeat

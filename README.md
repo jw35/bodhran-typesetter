@@ -90,7 +90,7 @@ X\<n\> or x\<n\> | End repeat **n** times (**n** must be a number)
 , | Comma
 \# | Half-width space
 b | Negative half-width space ('b' = 'back')
-3 | Negative two-thirds space ('3' = 'thirds')
+3 | Negative one-thirds space ('3' = 'thirds')
 \+ | Triplet made up of the previous and next symbol
 T\<b\>/\<u\> | Time signature **b/u** (**b** and **u** must be numbers)
 t\<b\>/\<u\> | Invisible time signature **b/u** (for alignment, **b** and **u** must be numbers)
