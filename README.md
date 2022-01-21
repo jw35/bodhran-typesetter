@@ -89,9 +89,9 @@ X or x | End repeat ('x' = 'times')
 X\<n\> or x\<n\> | End repeat **n** times (**n** must be a number)
 , | Comma
 \# | Half-width space
-\#\<n\> | 1/\<n\>'th width space (2 for half, 3 for third, etc.)
+\#\<n\> | 1/**n**'th width space (2 for half, 3 for third, etc., **n** must be a number)
 b | Negative half-width space ('b' = 'back')
-b\<n\> | Negative 1/\<n\>'th width space (2 for half, 3 for third, etc.)
+b\<n\> | Negative 1/**n**'th width space (2 for half, 3 for third, etc., **n** must be a number)
 \+ | Triplet made up of the previous and next symbol
 T\<b\>/\<u\> | Time signature **b/u** (**b** and **u** must be numbers)
 t\<b\>/\<u\> | Invisible time signature **b/u** (for alignment, **b** and **u** must be numbers)
