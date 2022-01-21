@@ -245,19 +245,28 @@ var BodhranTypesetter = (function() {
                     superscripts = true;
                 }
 
-                // Half-width space
+                // Space
                 else if (chars[pos] === '#') {
-                    width = space();
+                    pos++;
+                    var denom = '';
+                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                        denom += chars[pos];
+                        pos ++;
+                    }
+                    width = space(denom);
+                    pos --;
                 }
 
-                // Half-width negative space
+                // Negative space
                 else if (chars[pos] === 'b' || chars[pos] === 'B') {
-                    width = negspace();
-                }
-
-                // 2/3-width negative space
-                else if (chars[pos] === '3') {
-                    width = negspace(80 / 3);
+                    pos++;
+                    var denom = '';
+                    while (pos < chars.length && chars[pos] >= '0' && chars[pos] <= '9') {
+                        denom += chars[pos];
+                        pos ++;
+                    }
+                    width = negspace(denom);
+                    pos --;
                 }
 
                 // Repeat
@@ -680,18 +689,18 @@ var BodhranTypesetter = (function() {
 
         }
 
-        function space(howmuch) {
+        function space(denom) {
 
-            var dist = (howmuch ? howmuch : 40);
+            var dist = 80 / (denom ? denom : 2);
 
             staff_line(dist);
             return dist;
 
         }
 
-        function negspace(howmuch) {
+        function negspace(denom) {
 
-            var dist = (howmuch ? howmuch : 40);
+            var dist = 80 / (denom ? denom : 2);
 
             return -dist;
 
